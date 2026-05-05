@@ -73,7 +73,8 @@
     .topbar { padding: 22px 26px; border-bottom: 1px solid rgba(148, 163, 184, .16); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
     .topbar h2 { margin: 0; font-size: 26px; letter-spacing: -.03em; }
     .topbar small { color: var(--muted); }
-    .status-pill { padding: 8px 12px; border-radius: 999px; background: rgba(34,197,94,.13); color: #86efac; font-size: 12px; font-weight: 800; border: 1px solid rgba(34,197,94,.25); }
+    .status-pill { padding: 8px 12px; border-radius: 999px; background: rgba(34,197,94,.13); color: #86efac; font-size: 12px; font-weight: 800; border: 1px solid rgba(34,197,94,.25); cursor: pointer; }
+    .status-pill:hover { filter: brightness(1.15); }
 
     .content { padding: 22px 26px 32px; }
     .finance-grid { display: grid; grid-template-columns: 210px 1fr; gap: 18px; }
@@ -178,7 +179,7 @@
     <aside class="sidebar">
       <div class="brand">
         <h1>Daily OS</h1>
-        <p>Private command center with an isolated finance workspace.</p>
+        <p>Private command center for daily planning and personal systems.</p>
       </div>
       <nav class="os-nav">
         <button class="active" data-os="home">Home</button>
@@ -187,7 +188,7 @@
         <button data-os="calendar">Calendar</button>
       </nav>
       <div class="os-placeholder">
-        Finance data stays in this browser using <strong>localStorage</strong>. Default PIN is <strong>1234</strong>. Change it in Settings.
+        Private workspace data stays in this browser using <strong>localStorage</strong>. Default access PIN is <strong>1234</strong>.
       </div>
     </aside>
 
@@ -195,9 +196,9 @@
       <div class="topbar">
         <div>
           <h2 id="pageTitle">Private Finance Dashboard</h2>
-          <small id="pageSub">Manual finance tracker with PIN gate, debt payoff scenarios, and car fund planning.</small>
+          <small id="pageSub">Daily planning workspace.</small>
         </div>
-        <div class="status-pill" id="lockStatus">LOCKED</div>
+        <button class="status-pill" id="lockStatus" onclick="handleStatusPillClick()">OPEN</button>
       </div>
       <div class="content">
         <section id="homeArea" class="panel"></section>
@@ -334,7 +335,7 @@
       document.getElementById("inboxArea").classList.toggle("hidden", activeOS !== "inbox");
       document.getElementById("calendarArea").classList.toggle("hidden", activeOS !== "calendar");
       document.getElementById("pageTitle").textContent = activeOS === "finance" ? "Workspace" : activeOS === "home" ? "Daily Command Center" : activeOS[0].toUpperCase() + activeOS.slice(1);
-      document.getElementById("lockStatus").textContent = activeOS === "finance" ? (unlocked ? "UNLOCKED" : "READY") : "OPEN";
+      document.getElementById("lockStatus").textContent = activeOS === "finance" ? (unlocked ? "UNLOCKED" : "READY") : activeOS === "home" ? "OPEN WORKSPACE" : "OPEN";
 
       if (activeOS === "home") {
         renderHome();
@@ -343,6 +344,16 @@
       if (activeOS === "finance") {
         renderFinance();
       }
+    }
+
+    function openWorkspace() {
+      activeOS = "finance";
+      render();
+    }
+
+    function handleStatusPillClick() {
+      if (activeOS === "home") openWorkspace();
+      else if (activeOS === "finance" && unlocked) lockFinance();
     }
 
     function renderHome() {
@@ -373,7 +384,7 @@
           <div class="scenario-card">
             <h3>Workspace</h3>
             <p class="hint">Private tools are intentionally not visible from this screen.</p>
-            <button class="btn secondary" onclick="activeOS='finance'; render();">Open Workspace</button>
+            <button class="btn secondary" onclick="openWorkspace()">Open Workspace</button>
           </div>
         </div>`;
     }

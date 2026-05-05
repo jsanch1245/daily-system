@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily OS</title>
+
 <style>
 body {font-family: Arial; background:#0f172a; color:white; margin:0}
 .container {display:flex}
@@ -16,21 +16,27 @@ button.action {background:#22c55e; border:none; padding:10px; margin-top:10px; c
 .timeline {margin-top:20px}
 .event {padding:10px; border-bottom:1px solid #334155}
 .negative {color:#ef4444}
+.module-btn {background:#1f2937; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer}
 </style>
 </head>
+
 <body>
+
 <div class="container">
 <div class="sidebar">
 <button onclick="setTab('home')">Home</button>
 <button onclick="setTab('workspace')">Workspace</button>
 </div>
+
 <div class="main" id="main"></div>
 </div>
 
 <script>
-let tab='home'
-let unlocked=false
-let pin='1234'
+
+let tab = 'home'
+let unlocked = false
+let pin = '1234'
+let module = 'command' // command center vs cashflow
 
 let data = JSON.parse(localStorage.getItem('cfData')) || {
 accounts:[
@@ -42,61 +48,121 @@ events:[]
 
 function save(){localStorage.setItem('cfData',JSON.stringify(data))}
 
-function setTab(t){tab=t;render()}
+function setTab(t){tab=t; render()}
 
 function render(){
+
+// HOME (decoy)
 if(tab==='home'){
 document.getElementById('main').innerHTML=`
 <h2>Daily Command Center</h2>
+<p>Personal planning workspace</p>
 <button class='action' onclick="setTab('workspace')">Open Workspace</button>
 `
 }
 
+// WORKSPACE
 if(tab==='workspace'){
+
+// PIN SCREEN
 if(!unlocked){
 document.getElementById('main').innerHTML=`
 <h2>Enter PIN</h2>
 <input id='pinInput' type='password'>
 <button class='action' onclick='unlock()'>Enter</button>
 `
-}else{
-document.getElementById('main').innerHTML=workspaceHTML()
+}
+
+// AFTER PIN
+else{
+
+// COMMAND CENTER (landing page)
+if(module==='command'){
+document.getElementById('main').innerHTML=`
+<h2>Financial Command Center</h2>
+
+<div class='card'>
+<h3>Modules</h3>
+
+<div class='module-btn' onclick="openCashFlow()">Cash Flow</div>
+
+<div class='module-btn'>Debts (coming)</div>
+<div class='module-btn'>Scenarios (coming)</div>
+<div class='module-btn'>Investments (coming)</div>
+
+</div>
+`
+}
+
+// CASH FLOW MODULE
+if(module==='cashflow'){
+document.getElementById('main').innerHTML=cashflowHTML()
 renderTimeline()
 }
-}
+
 }
 
+}
+
+}
+
+// PIN unlock
 function unlock(){
 if(document.getElementById('pinInput').value===pin){
-unlocked=true; render()
-}else{alert('Wrong PIN')}
+unlocked=true
+render()
+}else{
+alert('Wrong PIN')
+}
 }
 
-function workspaceHTML(){
+// NAV FUNCTIONS
+function openCashFlow(){
+module='cashflow'
+render()
+}
+
+function backToCommand(){
+module='command'
+render()
+}
+
+// CASH FLOW UI
+function cashflowHTML(){
 return `
 <h2>Cash Flow</h2>
+
+<button class='action' onclick='backToCommand()'>← Back</button>
+
 <div class='card'>
 <label>Date</label>
 <input id='date' type='date'>
+
 <label>Description</label>
-<input id='desc'>
+<input id='desc' placeholder='Groceries, Mortgage, etc.'>
+
 <label>Amount</label>
 <input id='amount' type='number'>
+
 <label>Account</label>
 <select id='account'>
 ${data.accounts.map(a=>`<option value='${a.id}'>${a.name}</option>`).join('')}
 </select>
+
 <label>Type</label>
 <select id='type'>
 <option value='income'>Income</option>
 <option value='expense'>Expense</option>
 </select>
+
 <button class='action' onclick='addEvent()'>Add Event</button>
 </div>
+
 <div class='timeline' id='timeline'></div>
 `
 }
 
+// ADD EVENT
 function addEvent(){
 let e={
 id:Date.now(),
@@ -106,33 +172,46 @@ amount:Number(document.getElementById('amount').value),
 account:document.getElementById('account').value,
 type:document.getElementById('type').value
 }
+
 data.events.push(e)
 save()
 render()
 }
 
+// TIMELINE ENGINE (THIS IS YOUR SPREADSHEET LOGIC)
 function renderTimeline(){
+
 let events=[...data.events].sort((a,b)=>new Date(a.date)-new Date(b.date))
+
 let balances={}
 data.accounts.forEach(a=>balances[a.id]=a.balance)
 
 let html=''
 
 events.forEach(e=>{
+
 if(e.type==='income') balances[e.account]+=e.amount
 if(e.type==='expense') balances[e.account]-=e.amount
 
-html+=`<div class='event'>
+html+=`
+<div class='event'>
 <strong>${e.date}</strong> - ${e.description}<br>
 ${e.type==='income'?'+':'-'}$${e.amount}<br>
-Balance (${e.account}): <span class='${balances[e.account]<0?'negative':''}'>${balances[e.account]}</span>
-</div>`
+Balance (${e.account}): 
+<span class='${balances[e.account]<0?'negative':''}'>
+$${balances[e.account].toFixed(2)}
+</span>
+</div>
+`
 })
 
-document.getElementById('timeline').innerHTML=html
+document.getElementById('timeline').innerHTML=
+html || "<p>No events yet</p>"
 }
 
 render()
+
 </script>
+
 </body>
 </html>

@@ -1,828 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private Finance Dashboard</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-2: #1f2937;
-      --card: #020617;
-      --muted: #94a3b8;
-      --text: #e5e7eb;
-      --white: #ffffff;
-      --line: #334155;
-      --accent: #38bdf8;
-      --accent-2: #22c55e;
-      --warn: #f59e0b;
-      --danger: #ef4444;
-      --shadow: 0 20px 40px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, #1e293b 0%, #020617 45%, #000 100%);
-      color: var(--text);
-    }
-
-    .app-shell {
-      width: min(1400px, calc(100% - 32px));
-      margin: 24px auto;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 20px;
-    }
-
-    .sidebar, .main {
-      background: rgba(15, 23, 42, .88);
-      border: 1px solid rgba(148, 163, 184, .18);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-    }
-
-    .sidebar { padding: 20px; height: calc(100vh - 48px); position: sticky; top: 24px; }
-    .brand { margin-bottom: 28px; }
-    .brand h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: -.02em; }
-    .brand p { color: var(--muted); margin: 0; font-size: 13px; line-height: 1.4; }
-
-    .os-nav button, .tab-nav button, .sub-nav button {
-      width: 100%;
-      border: 0;
-      cursor: pointer;
-      color: var(--text);
-      background: transparent;
-      text-align: left;
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-weight: 700;
-      transition: .18s ease;
-    }
-
-    .os-nav button:hover, .tab-nav button:hover, .sub-nav button:hover { background: rgba(148, 163, 184, .12); }
-    .os-nav button.active, .sub-nav button.active { background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(34,197,94,.12)); color: var(--white); }
-    .os-placeholder { margin-top: 16px; padding: 16px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); font-size: 13px; line-height: 1.5; }
-
-    .main { min-height: calc(100vh - 48px); overflow: hidden; }
-    .topbar { padding: 22px 26px; border-bottom: 1px solid rgba(148, 163, 184, .16); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-    .topbar h2 { margin: 0; font-size: 26px; letter-spacing: -.03em; }
-    .topbar small { color: var(--muted); }
-    .status-pill { padding: 8px 12px; border-radius: 999px; background: rgba(34,197,94,.13); color: #86efac; font-size: 12px; font-weight: 800; border: 1px solid rgba(34,197,94,.25); cursor: pointer; }
-    .status-pill:hover { filter: brightness(1.15); }
-
-    .content { padding: 22px 26px 32px; }
-    .finance-grid { display: grid; grid-template-columns: 210px 1fr; gap: 18px; }
-    .sub-nav { background: rgba(2,6,23,.54); border: 1px solid rgba(148, 163, 184, .14); border-radius: 20px; padding: 10px; height: fit-content; }
-    .sub-nav button { margin-bottom: 4px; font-size: 14px; }
-
-    .panel { background: rgba(2,6,23,.44); border: 1px solid rgba(148, 163, 184, .16); border-radius: 22px; padding: 18px; }
-    .panel h3 { margin: 0 0 4px; font-size: 20px; letter-spacing: -.02em; }
-    .panel .hint { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.45; }
-
-    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-    .card { background: linear-gradient(180deg, rgba(30,41,59,.78), rgba(15,23,42,.86)); border: 1px solid rgba(148,163,184,.16); border-radius: var(--radius); padding: 16px; }
-    .card label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 9px; }
-    .value { font-size: 26px; font-weight: 900; letter-spacing: -.03em; }
-    .value.small { font-size: 18px; }
-    .delta { color: var(--muted); font-size: 12px; margin-top: 6px; }
-
-    input, textarea, select {
-      width: 100%;
-      background: rgba(15,23,42,.96);
-      border: 1px solid rgba(148,163,184,.24);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 11px 12px;
-      font: inherit;
-      outline: none;
-    }
-    input:focus, textarea:focus, select:focus { border-color: rgba(56,189,248,.85); box-shadow: 0 0 0 3px rgba(56,189,248,.14); }
-    textarea { min-height: 80px; resize: vertical; }
-    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; }
-    .form-grid .wide { grid-column: span 2; }
-    .field label { color: var(--muted); font-size: 12px; font-weight: 800; display: block; margin-bottom: 7px; }
-    .row { display: flex; gap: 10px; align-items: center; }
-    .row.between { justify-content: space-between; }
-    .stack { display: grid; gap: 14px; }
-
-    .btn { border: 0; border-radius: 13px; background: var(--accent); color: #00111a; padding: 11px 14px; font-weight: 900; cursor: pointer; transition: .18s ease; }
-    .btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
-    .btn.secondary { background: rgba(148,163,184,.18); color: var(--text); border: 1px solid rgba(148,163,184,.18); }
-    .btn.danger { background: rgba(239,68,68,.18); color: #fecaca; border: 1px solid rgba(239,68,68,.32); }
-    .btn.success { background: var(--accent-2); color: #03140a; }
-    .btn.small { padding: 8px 10px; font-size: 12px; }
-
-    .divider { height: 1px; background: rgba(148,163,184,.16); margin: 18px 0; }
-    .debt-list { display: grid; gap: 12px; }
-    .debt-card { display: grid; grid-template-columns: 1fr 130px 110px 130px 120px; gap: 12px; align-items: center; background: rgba(15,23,42,.82); border: 1px solid rgba(148,163,184,.16); padding: 14px; border-radius: var(--radius); }
-    .debt-name { font-weight: 900; }
-    .badge { display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 900; color: #0f172a; background: #facc15; padding: 4px 7px; border-radius: 999px; vertical-align: middle; }
-    .note { color: var(--muted); font-size: 12px; margin-top: 4px; }
-
-    .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .scenario-card { background: rgba(15,23,42,.82); border: 1px solid rgba(148,163,184,.16); border-radius: var(--radius); padding: 16px; }
-    .scenario-card.best { border-color: rgba(34,197,94,.55); box-shadow: inset 0 0 0 1px rgba(34,197,94,.15); }
-    .metric { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(148,163,184,.12); gap: 16px; }
-    .metric span:first-child { color: var(--muted); }
-    .metric strong { text-align: right; }
-    .strategic-read { background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.22); border-radius: var(--radius); padding: 14px; color: #dff7ff; line-height: 1.55; }
-
-    input[type="range"] { padding: 0; accent-color: var(--accent); }
-    .alloc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .progress-shell { height: 18px; background: rgba(148,163,184,.17); border-radius: 999px; overflow: hidden; border: 1px solid rgba(148,163,184,.18); }
-    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s ease; }
-    canvas { width: 100%; max-width: 100%; background: rgba(15,23,42,.82); border: 1px solid rgba(148,163,184,.16); border-radius: var(--radius); }
-
-    .warning { color: #fde68a; background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.25); border-radius: var(--radius); padding: 13px; line-height: 1.45; }
-    .success-box { color: #bbf7d0; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.22); border-radius: var(--radius); padding: 13px; line-height: 1.45; }
-
-    .lock-screen { min-height: 520px; display: grid; place-items: center; }
-    .pin-card { width: min(420px, 100%); background: rgba(2,6,23,.7); border: 1px solid rgba(148,163,184,.18); border-radius: 28px; padding: 28px; text-align: center; box-shadow: var(--shadow); }
-    .pin-card h3 { font-size: 24px; margin: 0 0 8px; }
-    .pin-card p { margin: 0 0 18px; color: var(--muted); }
-    .pin-dots { display: flex; justify-content: center; gap: 10px; margin: 16px 0 18px; }
-    .dot { width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgba(148,163,184,.4); background: rgba(148,163,184,.08); }
-    .dot.filled { background: var(--accent); border-color: var(--accent); }
-    .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .pin-pad button { padding: 16px; border-radius: 16px; border: 1px solid rgba(148,163,184,.2); background: rgba(30,41,59,.82); color: var(--white); font-size: 18px; font-weight: 900; cursor: pointer; }
-    .shake { animation: shake .36s ease; }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)} 40%{transform:translateX(10px)} 60%{transform:translateX(-7px)} 80%{transform:translateX(7px)} }
-
-    .hidden { display: none !important; }
-    .muted { color: var(--muted); }
-    .right { text-align: right; }
-
-    @media (max-width: 1050px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .sidebar { height: auto; position: static; }
-      .finance-grid { grid-template-columns: 1fr; }
-      .sub-nav { display: grid; grid-template-columns: repeat(5, 1fr); }
-      .cards, .scenario-grid, .alloc-grid { grid-template-columns: 1fr 1fr; }
-      .debt-card { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 720px) {
-      .cards, .scenario-grid, .alloc-grid, .form-grid { grid-template-columns: 1fr; }
-      .form-grid .wide { grid-column: auto; }
-      .sub-nav { grid-template-columns: 1fr; }
-      .topbar { align-items: flex-start; flex-direction: column; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily OS</title>
+<style>
+body {font-family: Arial; background:#0f172a; color:white; margin:0}
+.container {display:flex}
+.sidebar {width:200px; padding:20px; background:#020617}
+.sidebar button {display:block; width:100%; margin-bottom:10px; padding:10px; background:none; color:white; border:none; cursor:pointer}
+.main {flex:1; padding:20px}
+.card {background:#111827; padding:15px; margin-bottom:10px; border-radius:10px}
+input, select {width:100%; padding:8px; margin-top:5px}
+button.action {background:#22c55e; border:none; padding:10px; margin-top:10px; cursor:pointer}
+.timeline {margin-top:20px}
+.event {padding:10px; border-bottom:1px solid #334155}
+.negative {color:#ef4444}
+</style>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <h1>Daily OS</h1>
-        <p>Private command center for daily planning and personal systems.</p>
-      </div>
-      <nav class="os-nav">
-        <button class="active" data-os="home">Home</button>
-        <button data-os="finance">Workspace</button>
-        <button data-os="inbox">Inbox</button>
-        <button data-os="calendar">Calendar</button>
-      </nav>
-      <div class="os-placeholder">
-        Private workspace data stays in this browser using <strong>localStorage</strong>. Default access PIN is <strong>1234</strong>.
-      </div>
-    </aside>
+<div class="container">
+<div class="sidebar">
+<button onclick="setTab('home')">Home</button>
+<button onclick="setTab('workspace')">Workspace</button>
+</div>
+<div class="main" id="main"></div>
+</div>
 
-    <main class="main">
-      <div class="topbar">
-        <div>
-          <h2 id="pageTitle">Private Finance Dashboard</h2>
-          <small id="pageSub">Daily planning workspace.</small>
-        </div>
-        <button class="status-pill" id="lockStatus" onclick="handleStatusPillClick()">OPEN</button>
-      </div>
-      <div class="content">
-        <section id="homeArea" class="panel"></section>
-        <section id="financeArea" class="hidden"></section>
-        <section id="inboxArea" class="hidden panel">
-          <h3>Inbox</h3>
-          <p class="hint">Placeholder section. This is intentionally isolated from Finance.</p>
-        </section>
-        <section id="calendarArea" class="hidden panel">
-          <h3>Calendar</h3>
-          <p class="hint">Placeholder section. This is intentionally isolated from Finance.</p>
-        </section>
-      </div>
-    </main>
-  </div>
+<script>
+let tab='home'
+let unlocked=false
+let pin='1234'
 
-  <script>
-    const STORAGE_KEY = "privateFinanceDashboard.v1";
-    const PIN_KEY = "privateFinanceDashboard.pin";
+let data = JSON.parse(localStorage.getItem('cfData')) || {
+accounts:[
+{id:'sofi',name:'Sofi',balance:1376},
+{id:'usaa',name:'USAA',balance:404}
+],
+events:[]
+}
 
-    const defaultData = {
-      overview: {
-        checking1Name: "Primary Checking",
-        checking1: 0,
-        checking2Name: "Secondary Checking",
-        checking2: 0,
-        checking3Name: "Emergency Cash",
-        checking3: 0,
-        estimatedBonus: 55000,
-        bonusTaxRate: 35,
-        k401: 0,
-        homeEquity: 0,
-        profitShare: 0
-      },
-      debts: [],
-      scenario: {
-        bonusDebtPct: 70,
-        bonusCarPct: 20,
-        bonusCashPct: 10,
-        monthlyExtraFromCarSavings: 500
-      },
-      carFund: {
-        targetAmount: 30000,
-        currentSaved: 0,
-        monthlyContribution: 500,
-        targetDate: nextYearMonth()
-      }
-    };
+function save(){localStorage.setItem('cfData',JSON.stringify(data))}
 
-    let data = loadData();
-    let activeOS = "home";
-    let activeFinanceTab = "overview";
-    let unlocked = false;
-    let pinEntry = "";
+function setTab(t){tab=t;render()}
 
-    function nextYearMonth() {
-      const d = new Date();
-      d.setFullYear(d.getFullYear() + 1);
-      return d.toISOString().slice(0, 10);
-    }
+function render(){
+if(tab==='home'){
+document.getElementById('main').innerHTML=`
+<h2>Daily Command Center</h2>
+<button class='action' onclick="setTab('workspace')">Open Workspace</button>
+`
+}
 
-    function currency(value) {
-      const n = Number(value) || 0;
-      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-    }
+if(tab==='workspace'){
+if(!unlocked){
+document.getElementById('main').innerHTML=`
+<h2>Enter PIN</h2>
+<input id='pinInput' type='password'>
+<button class='action' onclick='unlock()'>Enter</button>
+`
+}else{
+document.getElementById('main').innerHTML=workspaceHTML()
+renderTimeline()
+}
+}
+}
 
-    function percent(value) {
-      return `${(Number(value) || 0).toFixed(2)}%`;
-    }
+function unlock(){
+if(document.getElementById('pinInput').value===pin){
+unlocked=true; render()
+}else{alert('Wrong PIN')}
+}
 
-    function loadData() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return structuredClone(defaultData);
-        return mergeDefaults(structuredClone(defaultData), JSON.parse(raw));
-      } catch {
-        return structuredClone(defaultData);
-      }
-    }
+function workspaceHTML(){
+return `
+<h2>Cash Flow</h2>
+<div class='card'>
+<label>Date</label>
+<input id='date' type='date'>
+<label>Description</label>
+<input id='desc'>
+<label>Amount</label>
+<input id='amount' type='number'>
+<label>Account</label>
+<select id='account'>
+${data.accounts.map(a=>`<option value='${a.id}'>${a.name}</option>`).join('')}
+</select>
+<label>Type</label>
+<select id='type'>
+<option value='income'>Income</option>
+<option value='expense'>Expense</option>
+</select>
+<button class='action' onclick='addEvent()'>Add Event</button>
+</div>
+<div class='timeline' id='timeline'></div>
+`
+}
 
-    function mergeDefaults(base, saved) {
-      for (const key in saved) {
-        if (saved[key] && typeof saved[key] === "object" && !Array.isArray(saved[key])) {
-          base[key] = mergeDefaults(base[key] || {}, saved[key]);
-        } else {
-          base[key] = saved[key];
-        }
-      }
-      return base;
-    }
+function addEvent(){
+let e={
+id:Date.now(),
+date:document.getElementById('date').value,
+description:document.getElementById('desc').value,
+amount:Number(document.getElementById('amount').value),
+account:document.getElementById('account').value,
+type:document.getElementById('type').value
+}
+data.events.push(e)
+save()
+render()
+}
 
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
+function renderTimeline(){
+let events=[...data.events].sort((a,b)=>new Date(a.date)-new Date(b.date))
+let balances={}
+data.accounts.forEach(a=>balances[a.id]=a.balance)
 
-    function getPin() {
-      return localStorage.getItem(PIN_KEY) || "1234";
-    }
+let html=''
 
-    function setPin(pin) {
-      localStorage.setItem(PIN_KEY, pin);
-    }
+events.forEach(e=>{
+if(e.type==='income') balances[e.account]+=e.amount
+if(e.type==='expense') balances[e.account]-=e.amount
 
-    function totalLiquidCash() {
-      const o = data.overview;
-      return Number(o.checking1 || 0) + Number(o.checking2 || 0) + Number(o.checking3 || 0);
-    }
+html+=`<div class='event'>
+<strong>${e.date}</strong> - ${e.description}<br>
+${e.type==='income'?'+':'-'}$${e.amount}<br>
+Balance (${e.account}): <span class='${balances[e.account]<0?'negative':''}'>${balances[e.account]}</span>
+</div>`
+})
 
-    function totalDebtBalance() {
-      return data.debts.reduce((sum, d) => sum + Number(d.balance || 0), 0);
-    }
+document.getElementById('timeline').innerHTML=html
+}
 
-    function totalMinPayments() {
-      return data.debts.reduce((sum, d) => sum + Number(d.minPayment || 0), 0);
-    }
-
-    function netBonus() {
-      return Number(data.overview.estimatedBonus || 0) * (1 - Number(data.overview.bonusTaxRate || 0) / 100);
-    }
-
-    function lockedWealth() {
-      const o = data.overview;
-      return Number(o.k401 || 0) + Number(o.homeEquity || 0) + Number(o.profitShare || 0);
-    }
-
-    function sortedDebts() {
-      return [...data.debts].sort((a, b) => Number(b.rate || 0) - Number(a.rate || 0));
-    }
-
-    function render() {
-      document.querySelectorAll(".os-nav button").forEach(btn => btn.classList.toggle("active", btn.dataset.os === activeOS));
-      document.getElementById("homeArea").classList.toggle("hidden", activeOS !== "home");
-      document.getElementById("financeArea").classList.toggle("hidden", activeOS !== "finance");
-      document.getElementById("inboxArea").classList.toggle("hidden", activeOS !== "inbox");
-      document.getElementById("calendarArea").classList.toggle("hidden", activeOS !== "calendar");
-      document.getElementById("pageTitle").textContent = activeOS === "finance" ? "Workspace" : activeOS === "home" ? "Daily Command Center" : activeOS[0].toUpperCase() + activeOS.slice(1);
-      document.getElementById("lockStatus").textContent = activeOS === "finance" ? (unlocked ? "UNLOCKED" : "READY") : activeOS === "home" ? "OPEN WORKSPACE" : "OPEN";
-
-      if (activeOS === "home") {
-        renderHome();
-      }
-
-      if (activeOS === "finance") {
-        renderFinance();
-      }
-    }
-
-    function openWorkspace() {
-      activeOS = "finance";
-      render();
-    }
-
-    function handleStatusPillClick() {
-      if (activeOS === "home") openWorkspace();
-      else if (activeOS === "finance" && unlocked) lockFinance();
-    }
-
-    function renderHome() {
-      const area = document.getElementById("homeArea");
-      area.innerHTML = `
-        <h3>Today’s Operating View</h3>
-        <p class="hint">A lightweight daily workspace for reminders, priorities, and planning. Sensitive workspaces are separated behind their own controls.</p>
-        <div class="cards">
-          <div class="card"><label>Top Priority</label><input id="dailyPriority" placeholder="Enter today’s main focus"></div>
-          <div class="card"><label>Open Loops</label><div class="value small">3 items</div><div class="delta">Placeholder planning view</div></div>
-          <div class="card"><label>Upcoming</label><div class="value small">No events connected</div><div class="delta">Calendar placeholder</div></div>
-          <div class="card"><label>Status</label><div class="value small">Planning Mode</div><div class="delta">Local browser dashboard</div></div>
-        </div>
-        <div class="divider"></div>
-        <div class="scenario-grid">
-          <div class="scenario-card">
-            <h3>Inbox Snapshot</h3>
-            <div class="metric"><span>Urgent</span><strong>0</strong></div>
-            <div class="metric"><span>Follow-ups</span><strong>0</strong></div>
-            <div class="metric"><span>Waiting on others</span><strong>0</strong></div>
-          </div>
-          <div class="scenario-card">
-            <h3>Calendar Snapshot</h3>
-            <div class="metric"><span>Today</span><strong>Manual</strong></div>
-            <div class="metric"><span>Focus blocks</span><strong>Not connected</strong></div>
-            <div class="metric"><span>Travel</span><strong>None</strong></div>
-          </div>
-          <div class="scenario-card">
-            <h3>Workspace</h3>
-            <p class="hint">Private tools are intentionally not visible from this screen.</p>
-            <button class="btn secondary" onclick="openWorkspace()">Open Workspace</button>
-          </div>
-        </div>`;
-    }
-
-    function renderFinance() {
-      const area = document.getElementById("financeArea");
-      if (!unlocked) {
-        area.innerHTML = lockScreen();
-        updateDots();
-        return;
-      }
-
-      area.innerHTML = `
-        <div class="finance-grid">
-          <nav class="sub-nav">
-            ${["overview", "debts", "scenarios", "carFund", "settings"].map(tab => `
-              <button class="${activeFinanceTab === tab ? "active" : ""}" onclick="setFinanceTab('${tab}')">${tabLabel(tab)}</button>
-            `).join("")}
-          </nav>
-          <section class="panel" id="financePanel"></section>
-        </div>`;
-
-      const panel = document.getElementById("financePanel");
-      if (activeFinanceTab === "overview") panel.innerHTML = overviewHTML();
-      if (activeFinanceTab === "debts") panel.innerHTML = debtsHTML();
-      if (activeFinanceTab === "scenarios") panel.innerHTML = scenariosHTML();
-      if (activeFinanceTab === "carFund") panel.innerHTML = carFundHTML();
-      if (activeFinanceTab === "settings") panel.innerHTML = settingsHTML();
-      if (activeFinanceTab === "carFund") drawCarChart();
-    }
-
-    function tabLabel(tab) {
-      return ({ overview: "Overview", debts: "Debts", scenarios: "Scenarios", carFund: "Car Fund", settings: "Settings" })[tab];
-    }
-
-    function lockScreen() {
-      return `
-        <div class="lock-screen">
-          <div class="pin-card" id="pinCard">
-            <h3>Workspace Locked</h3>
-            <p>Enter your 4-digit PIN to continue.</p>
-            <div class="pin-dots">
-              <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            </div>
-            <div class="pin-pad">
-              ${[1,2,3,4,5,6,7,8,9].map(n => `<button onclick="pressPin('${n}')">${n}</button>`).join("")}
-              <button onclick="clearPin()">Clear</button>
-              <button onclick="pressPin('0')">0</button>
-              <button onclick="backPin()">⌫</button>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    function updateDots() {
-      document.querySelectorAll(".dot").forEach((dot, i) => dot.classList.toggle("filled", i < pinEntry.length));
-    }
-
-    function pressPin(n) {
-      if (pinEntry.length >= 4) return;
-      pinEntry += n;
-      updateDots();
-      if (pinEntry.length === 4) {
-        if (pinEntry === getPin()) {
-          unlocked = true;
-          pinEntry = "";
-          render();
-        } else {
-          const card = document.getElementById("pinCard");
-          card.classList.add("shake");
-          setTimeout(() => {
-            pinEntry = "";
-            card.classList.remove("shake");
-            updateDots();
-          }, 380);
-        }
-      }
-    }
-    function clearPin() { pinEntry = ""; updateDots(); }
-    function backPin() { pinEntry = pinEntry.slice(0, -1); updateDots(); }
-    function setFinanceTab(tab) { activeFinanceTab = tab; render(); }
-
-    function overviewHTML() {
-      const o = data.overview;
-      return `
-        <h3>Overview</h3>
-        <p class="hint">Track liquid cash, debt load, bonus estimate, and locked or contingent wealth.</p>
-        <div class="cards">
-          <div class="card"><label>Total Liquid Cash</label><div class="value">${currency(totalLiquidCash())}</div><div class="delta">Checking + emergency cash</div></div>
-          <div class="card"><label>Total Debt Balance</label><div class="value">${currency(totalDebtBalance())}</div><div class="delta">Across all debt cards</div></div>
-          <div class="card"><label>Monthly Minimums</label><div class="value">${currency(totalMinPayments())}</div><div class="delta">Combined required payments</div></div>
-          <div class="card"><label>Estimated Net Bonus</label><div class="value">${currency(netBonus())}</div><div class="delta">After estimated tax rate</div></div>
-        </div>
-        <div class="divider"></div>
-        <h3>Editable Accounts</h3>
-        <p class="hint">Update values manually. Changes save automatically in this browser.</p>
-        <div class="form-grid">
-          ${moneyField("Checking 1 Name", "overview.checking1Name", o.checking1Name, "text")}
-          ${moneyField("Checking 1 Balance", "overview.checking1", o.checking1)}
-          ${moneyField("Checking 2 Name", "overview.checking2Name", o.checking2Name, "text")}
-          ${moneyField("Checking 2 Balance", "overview.checking2", o.checking2)}
-          ${moneyField("Checking 3 Name", "overview.checking3Name", o.checking3Name, "text")}
-          ${moneyField("Checking 3 Balance", "overview.checking3", o.checking3)}
-          ${moneyField("Gross Bonus Estimate", "overview.estimatedBonus", o.estimatedBonus)}
-          ${moneyField("Bonus Tax Rate %", "overview.bonusTaxRate", o.bonusTaxRate)}
-        </div>
-        <div class="divider"></div>
-        <div class="cards">
-          <div class="card"><label>401k Estimate</label><input type="number" value="${o.k401}" onchange="updatePath('overview.k401', this.value)"></div>
-          <div class="card"><label>Home Equity</label><input type="number" value="${o.homeEquity}" onchange="updatePath('overview.homeEquity', this.value)"></div>
-          <div class="card"><label>Profit Share</label><input type="number" value="${o.profitShare}" onchange="updatePath('overview.profitShare', this.value)"></div>
-          <div class="card"><label>Locked / Contingent Wealth</label><div class="value">${currency(lockedWealth())}</div><div class="delta">401k + equity + profit share</div></div>
-        </div>`;
-    }
-
-    function moneyField(label, path, value, type = "number") {
-      return `<div class="field"><label>${label}</label><input type="${type}" value="${value ?? ""}" onchange="updatePath('${path}', this.value)"></div>`;
-    }
-
-    function debtsHTML() {
-      const debts = sortedDebts();
-      return `
-        <h3>Debts</h3>
-        <p class="hint">Add debt balances and rates. Cards auto-sort by highest interest rate first.</p>
-        <div class="form-grid">
-          <div class="field"><label>Name</label><input id="debtName" placeholder="Amex, Auto Loan, etc."></div>
-          <div class="field"><label>Balance</label><input id="debtBalance" type="number" placeholder="4500"></div>
-          <div class="field"><label>Interest Rate %</label><input id="debtRate" type="number" step="0.01" placeholder="27.99"></div>
-          <div class="field"><label>Minimum Payment</label><input id="debtMin" type="number" placeholder="150"></div>
-          <div class="field wide"><label>Notes</label><input id="debtNotes" placeholder="Optional notes"></div>
-          <button class="btn success" onclick="addDebt()">Add Debt</button>
-        </div>
-        <div class="divider"></div>
-        <div class="debt-list">
-          ${debts.length ? debts.map((d, idx) => debtCardHTML(d, idx)).join("") : `<div class="warning">No debts added yet. Add debts above to activate the payoff simulator.</div>`}
-        </div>
-        <div class="divider"></div>
-        <div class="cards">
-          <div class="card"><label>Total Debt</label><div class="value">${currency(totalDebtBalance())}</div></div>
-          <div class="card"><label>Total Minimums</label><div class="value">${currency(totalMinPayments())}</div></div>
-          <div class="card"><label>Monthly Interest Cost</label><div class="value">${currency(debts.reduce((s,d)=>s+monthlyInterest(d),0))}</div></div>
-          <div class="card"><label>Highest Rate</label><div class="value small">${debts[0] ? `${debts[0].name}: ${percent(debts[0].rate)}` : "None"}</div></div>
-        </div>`;
-    }
-
-    function debtCardHTML(d, idx) {
-      return `
-        <div class="debt-card">
-          <div><div class="debt-name">${escapeHTML(d.name)} ${idx === 0 ? '<span class="badge">HIGHEST RATE</span>' : ''}</div><div class="note">${escapeHTML(d.notes || "No notes")}</div></div>
-          <div><span class="muted">Balance</span><br><strong>${currency(d.balance)}</strong></div>
-          <div><span class="muted">Rate</span><br><strong>${percent(d.rate)}</strong></div>
-          <div><span class="muted">Minimum</span><br><strong>${currency(d.minPayment)}</strong></div>
-          <div class="right"><span class="muted">Monthly Interest</span><br><strong>${currency(monthlyInterest(d))}</strong><br><button class="btn danger small" onclick="deleteDebt('${d.id}')">Delete</button></div>
-        </div>`;
-    }
-
-    function monthlyInterest(d) {
-      return Number(d.balance || 0) * (Number(d.rate || 0) / 100) / 12;
-    }
-
-    function addDebt() {
-      const name = document.getElementById("debtName").value.trim();
-      const balance = Number(document.getElementById("debtBalance").value || 0);
-      const rate = Number(document.getElementById("debtRate").value || 0);
-      const minPayment = Number(document.getElementById("debtMin").value || 0);
-      const notes = document.getElementById("debtNotes").value.trim();
-      if (!name || balance <= 0) return alert("Add at least a debt name and balance.");
-      data.debts.push({ id: crypto.randomUUID(), name, balance, rate, minPayment, notes });
-      saveData(); render();
-    }
-
-    function deleteDebt(id) {
-      data.debts = data.debts.filter(d => d.id !== id);
-      saveData(); render();
-    }
-
-    function scenariosHTML() {
-      const s = data.scenario;
-      const minimum = simulatePayoff(0, 0);
-      const bonusDebt = netBonus() * s.bonusDebtPct / 100;
-      const carAllocation = netBonus() * s.bonusCarPct / 100;
-      const cashAllocation = netBonus() * s.bonusCashPct / 100;
-      const bonusOnly = simulatePayoff(bonusDebt, 0);
-      const bonusPlusMonthly = simulatePayoff(bonusDebt, Number(s.monthlyExtraFromCarSavings || 0));
-      const bestInterest = Math.min(minimum.interest, bonusOnly.interest, bonusPlusMonthly.interest);
-      return `
-        <h3>Scenarios</h3>
-        <p class="hint">Avalanche method simulator. Highest-rate debts are attacked first after minimum payments.</p>
-        <div class="cards">
-          <div class="card"><label>Net Bonus Available</label><div class="value">${currency(netBonus())}</div><div class="delta">Gross bonus less estimated tax</div></div>
-          <div class="card"><label>Debt Allocation</label><div class="value">${currency(bonusDebt)}</div><div class="delta">${s.bonusDebtPct}% of net bonus</div></div>
-          <div class="card"><label>Car Allocation</label><div class="value">${currency(carAllocation)}</div><div class="delta">${s.bonusCarPct}% of net bonus</div></div>
-          <div class="card"><label>Cash Allocation</label><div class="value">${currency(cashAllocation)}</div><div class="delta">${s.bonusCashPct}% of net bonus</div></div>
-        </div>
-        <div class="divider"></div>
-        <div class="alloc-grid">
-          <div class="field"><label>Debt Allocation: <span id="debtPctLabel">${s.bonusDebtPct}%</span></label><input type="range" min="0" max="100" value="${s.bonusDebtPct}" oninput="setAllocation('debt', this.value)"></div>
-          <div class="field"><label>Car Allocation: <span id="carPctLabel">${s.bonusCarPct}%</span></label><input type="range" min="0" max="100" value="${s.bonusCarPct}" oninput="setAllocation('car', this.value)"></div>
-          <div class="field"><label>Cash Allocation: <span id="cashPctLabel">${s.bonusCashPct}%</span></label><input type="range" min="0" max="100" value="${s.bonusCashPct}" oninput="setAllocation('cash', this.value)"></div>
-          <div class="field"><label>Monthly Car Savings Redirect</label><input type="number" value="${s.monthlyExtraFromCarSavings}" onchange="updatePath('scenario.monthlyExtraFromCarSavings', this.value)"></div>
-        </div>
-        <div class="divider"></div>
-        <div class="scenario-grid">
-          ${scenarioCard("Minimums Only", minimum, minimum.interest === bestInterest)}
-          ${scenarioCard("Bonus Lump Sum to Debt", bonusOnly, bonusOnly.interest === bestInterest)}
-          ${scenarioCard("Bonus + Monthly Redirect", bonusPlusMonthly, bonusPlusMonthly.interest === bestInterest)}
-        </div>
-        <div class="divider"></div>
-        <div class="strategic-read"><strong>Strategic read:</strong> ${strategicRead(minimum, bonusOnly, bonusPlusMonthly)}</div>`;
-    }
-
-    function scenarioCard(title, result, best) {
-      return `<div class="scenario-card ${best ? "best" : ""}">
-        <h3>${title}</h3>
-        <div class="metric"><span>Months to debt-free</span><strong>${result.monthsText}</strong></div>
-        <div class="metric"><span>Total interest paid</span><strong>${currency(result.interest)}</strong></div>
-        <div class="metric"><span>Starting debt after lump sum</span><strong>${currency(result.startingDebtAfterLump)}</strong></div>
-        <div class="metric"><span>Monthly payoff power</span><strong>${currency(result.monthlyPayment)}</strong></div>
-      </div>`;
-    }
-
-    function simulatePayoff(lumpSum, monthlyExtra) {
-      let debts = sortedDebts().map(d => ({ ...d, balance: Number(d.balance || 0), rate: Number(d.rate || 0), minPayment: Number(d.minPayment || 0) }));
-      let remainingLump = Number(lumpSum || 0);
-      for (const d of debts) {
-        const pay = Math.min(d.balance, remainingLump);
-        d.balance -= pay;
-        remainingLump -= pay;
-        if (remainingLump <= 0) break;
-      }
-      debts = debts.filter(d => d.balance > 0.01);
-      const startingDebtAfterLump = debts.reduce((s, d) => s + d.balance, 0);
-      const monthlyPayment = totalMinPayments() + Number(monthlyExtra || 0);
-      if (debts.length === 0) return { months: 0, monthsText: "Immediate", interest: 0, startingDebtAfterLump, monthlyPayment };
-      if (monthlyPayment <= 0) return { months: Infinity, monthsText: "No payoff path", interest: 0, startingDebtAfterLump, monthlyPayment };
-
-      let months = 0;
-      let interest = 0;
-      while (debts.reduce((s,d)=>s+d.balance,0) > 0.01 && months < 1200) {
-        months++;
-        for (const d of debts) {
-          const i = d.balance * (d.rate / 100) / 12;
-          d.balance += i;
-          interest += i;
-        }
-        let available = monthlyPayment;
-        for (const d of debts) {
-          if (d.balance <= 0) continue;
-          const minPay = Math.min(d.balance, d.minPayment);
-          d.balance -= minPay;
-          available -= minPay;
-        }
-        debts.sort((a,b)=>b.rate-a.rate);
-        for (const d of debts) {
-          if (available <= 0) break;
-          if (d.balance <= 0) continue;
-          const extra = Math.min(d.balance, available);
-          d.balance -= extra;
-          available -= extra;
-        }
-        debts = debts.filter(d => d.balance > 0.01);
-      }
-      return { months, monthsText: months >= 1200 ? "100+ years" : `${months} mo`, interest, startingDebtAfterLump, monthlyPayment };
-    }
-
-    function strategicRead(minimum, bonusOnly, bonusPlusMonthly) {
-      if (!data.debts.length) return "Add your debts to activate the analysis. The dashboard will compare how much time and interest each payoff strategy avoids.";
-      const savedByBonus = minimum.interest - bonusOnly.interest;
-      const savedByRedirect = minimum.interest - bonusPlusMonthly.interest;
-      const monthsSaved = minimum.months - bonusPlusMonthly.months;
-      return `Minimum payments preserve cash but usually maximize interest drag. Applying the bonus to high-rate debt could avoid about ${currency(savedByBonus)} in interest. Combining the bonus with a recurring monthly redirect could avoid about ${currency(savedByRedirect)} and shorten the payoff timeline by roughly ${Math.max(0, monthsSaved)} months.`;
-    }
-
-    function setAllocation(which, value) {
-      value = Number(value);
-      if (which === "debt") data.scenario.bonusDebtPct = value;
-      if (which === "car") data.scenario.bonusCarPct = value;
-      if (which === "cash") data.scenario.bonusCashPct = value;
-      const total = data.scenario.bonusDebtPct + data.scenario.bonusCarPct + data.scenario.bonusCashPct;
-      if (total !== 100) {
-        const others = ["bonusDebtPct", "bonusCarPct", "bonusCashPct"].filter(k => k !== ({debt:"bonusDebtPct",car:"bonusCarPct",cash:"bonusCashPct"})[which]);
-        const remainder = Math.max(0, 100 - value);
-        const currentOthers = others.reduce((s,k)=>s+data.scenario[k],0) || 1;
-        data.scenario[others[0]] = Math.round(remainder * data.scenario[others[0]] / currentOthers);
-        data.scenario[others[1]] = 100 - value - data.scenario[others[0]];
-      }
-      saveData(); render();
-    }
-
-    function carFundHTML() {
-      const c = data.carFund;
-      const months = monthsUntil(c.targetDate);
-      const projected = Number(c.currentSaved || 0) + Number(c.monthlyContribution || 0) * months;
-      const gap = Number(c.targetAmount || 0) - projected;
-      const neededMonthly = months > 0 ? Math.max(0, (Number(c.targetAmount || 0) - Number(c.currentSaved || 0)) / months) : 0;
-      const progress = Number(c.targetAmount || 0) > 0 ? Math.min(100, Number(c.currentSaved || 0) / Number(c.targetAmount || 0) * 100) : 0;
-      return `
-        <h3>Car Fund</h3>
-        <p class="hint">Track savings progress toward a vehicle goal and target date.</p>
-        <div class="form-grid">
-          ${moneyField("Target Amount", "carFund.targetAmount", c.targetAmount)}
-          ${moneyField("Current Saved", "carFund.currentSaved", c.currentSaved)}
-          ${moneyField("Monthly Contribution", "carFund.monthlyContribution", c.monthlyContribution)}
-          <div class="field"><label>Target Date</label><input type="date" value="${c.targetDate}" onchange="updatePath('carFund.targetDate', this.value)"></div>
-        </div>
-        <div class="divider"></div>
-        <div class="cards">
-          <div class="card"><label>Months Remaining</label><div class="value">${months}</div></div>
-          <div class="card"><label>Projected Savings</label><div class="value">${currency(projected)}</div></div>
-          <div class="card"><label>Needed Monthly</label><div class="value">${currency(neededMonthly)}</div></div>
-          <div class="card"><label>Projected Gap</label><div class="value">${currency(Math.max(0, gap))}</div></div>
-        </div>
-        <div class="divider"></div>
-        <div class="stack">
-          <div><div class="row between"><strong>Progress</strong><span>${progress.toFixed(1)}%</span></div><div class="progress-shell"><div class="progress-bar" style="width:${progress}%"></div></div></div>
-          ${gap > 0 ? `<div class="warning">At the current pace, you are projected to fall short by ${currency(gap)}. Increase the monthly contribution to about ${currency(neededMonthly)} to hit the target.</div>` : `<div class="success-box">You are projected to meet or exceed the goal by the target date.</div>`}
-          <canvas id="carChart" width="900" height="330"></canvas>
-        </div>`;
-    }
-
-    function monthsUntil(dateString) {
-      const target = new Date(dateString + "T00:00:00");
-      const now = new Date();
-      return Math.max(0, (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth()));
-    }
-
-    function drawCarChart() {
-      const canvas = document.getElementById("carChart");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const c = data.carFund;
-      const months = Math.max(1, monthsUntil(c.targetDate));
-      const current = Number(c.currentSaved || 0);
-      const monthly = Number(c.monthlyContribution || 0);
-      const target = Number(c.targetAmount || 0);
-      const values = [];
-      for (let i = 0; i <= months; i++) values.push(current + monthly * i);
-      const max = Math.max(target, ...values, 1);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.font = "14px Inter, system-ui";
-      ctx.fillStyle = "#e5e7eb";
-      ctx.fillText("Car Fund Projection", 24, 30);
-      const left = 55, right = 24, top = 52, bottom = 46;
-      const w = canvas.width - left - right;
-      const h = canvas.height - top - bottom;
-      ctx.strokeStyle = "rgba(148,163,184,.35)";
-      ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, top+h); ctx.lineTo(left+w, top+h); ctx.stroke();
-      const barW = Math.max(8, w / values.length * .64);
-      values.forEach((v, i) => {
-        const x = left + i * (w / Math.max(1, values.length - 1)) - barW/2;
-        const barH = v / max * h;
-        ctx.fillStyle = i === 0 ? "rgba(56,189,248,.72)" : "rgba(34,197,94,.72)";
-        ctx.fillRect(x, top + h - barH, barW, barH);
-      });
-      const targetY = top + h - (target / max * h);
-      ctx.strokeStyle = "rgba(250,204,21,.9)";
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath(); ctx.moveTo(left, targetY); ctx.lineTo(left+w, targetY); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#fde68a"; ctx.fillText(`Target: ${currency(target)}`, left + 8, Math.max(18, targetY - 8));
-      ctx.fillStyle = "#94a3b8";
-      ctx.fillText("Now", left - 8, top + h + 26);
-      ctx.fillText(`${months} mo`, left + w - 34, top + h + 26);
-    }
-
-    function settingsHTML() {
-      return `
-        <h3>Settings</h3>
-        <p class="hint">Manage privacy controls and local data. Data remains in this browser unless exported.</p>
-        <div class="cards">
-          <div class="card"><label>Change PIN</label><input id="newPin" maxlength="4" inputmode="numeric" placeholder="4-digit PIN"><div style="height:10px"></div><button class="btn" onclick="changePin()">Save New PIN</button></div>
-          <div class="card"><label>Export Data</label><div class="delta">Download a JSON backup of all finance data.</div><div style="height:16px"></div><button class="btn secondary" onclick="exportData()">Export JSON</button></div>
-          <div class="card"><label>Reset Data</label><div class="delta">Clear all local finance dashboard data.</div><div style="height:16px"></div><button class="btn danger" onclick="resetData()">Reset Everything</button></div>
-          <div class="card"><label>Lock Finance</label><div class="delta">Return the Finance tab to PIN-gated mode.</div><div style="height:16px"></div><button class="btn secondary" onclick="lockFinance()">Lock Now</button></div>
-        </div>`;
-    }
-
-    function changePin() {
-      const pin = document.getElementById("newPin").value.trim();
-      if (!/^\d{4}$/.test(pin)) return alert("PIN must be exactly 4 digits.");
-      setPin(pin);
-      document.getElementById("newPin").value = "";
-      alert("PIN updated.");
-    }
-
-    function exportData() {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `finance-dashboard-backup-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function resetData() {
-      if (!confirm("Reset all finance data in this browser?")) return;
-      data = structuredClone(defaultData);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      render();
-    }
-
-    function lockFinance() {
-      unlocked = false;
-      pinEntry = "";
-      render();
-    }
-
-    function updatePath(path, value) {
-      const parts = path.split(".");
-      let target = data;
-      for (let i = 0; i < parts.length - 1; i++) target = target[parts[i]];
-      const key = parts[parts.length - 1];
-      const numericKeys = new Set(["checking1", "checking2", "checking3", "estimatedBonus", "bonusTaxRate", "k401", "homeEquity", "profitShare", "targetAmount", "currentSaved", "monthlyContribution", "monthlyExtraFromCarSavings"]);
-      target[key] = numericKeys.has(key) ? Number(value || 0) : value;
-      saveData(); render();
-    }
-
-    function escapeHTML(str) {
-      return String(str).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
-    }
-
-    document.querySelectorAll(".os-nav button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        activeOS = btn.dataset.os;
-        render();
-      });
-    });
-
-    document.addEventListener("keydown", e => {
-      if (activeOS === "finance" && !unlocked) {
-        if (/^\d$/.test(e.key)) pressPin(e.key);
-        if (e.key === "Backspace") backPin();
-        if (e.key === "Escape") clearPin();
-      }
-    });
-
-    saveData();
-    render();
-  </script>
+render()
+</script>
 </body>
 </html>

@@ -1,217 +1,446 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily OS</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily OS</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: #101827;
+      --panel2: #162235;
+      --card: #0b1220;
+      --text: #eef2f7;
+      --muted: #9aa8bb;
+      --line: rgba(154,168,187,.22);
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --yellow: #facc15;
+      --red: #ef4444;
+      --radius: 22px;
+      --shadow: 0 20px 45px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #18263c 0%, #08111f 46%, #020617 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select, textarea { font: inherit; }
+    .shell {
+      width: min(1380px, calc(100% - 32px));
+      margin: 22px auto;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 18px;
+    }
+    .sidebar, .main, .panel, .card, .subnav {
+      background: rgba(16,24,39,.9);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .sidebar { padding: 20px; height: calc(100vh - 44px); position: sticky; top: 22px; }
+    .brand h1 { margin: 0 0 8px; font-size: 24px; }
+    .brand p { margin: 0 0 24px; color: var(--muted); line-height: 1.45; font-size: 14px; }
+    .nav button, .subnav button {
+      width: 100%; border: 0; cursor: pointer; color: var(--text); background: transparent;
+      text-align: left; border-radius: 16px; padding: 13px 14px; font-weight: 800; margin-bottom: 6px;
+    }
+    .nav button:hover, .subnav button:hover { background: rgba(148,163,184,.12); }
+    .nav button.active, .subnav button.active { background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(34,197,94,.12)); }
+    .sidebar-note { margin-top: 22px; border: 1px dashed rgba(154,168,187,.35); border-radius: 18px; padding: 15px; color: var(--muted); line-height: 1.45; font-size: 13px; }
+    .main { min-height: calc(100vh - 44px); overflow: hidden; }
+    .topbar { padding: 22px 26px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .topbar h2 { margin: 0; font-size: clamp(26px, 4vw, 42px); letter-spacing: -.04em; }
+    .topbar p { margin: 5px 0 0; color: var(--muted); }
+    .status-pill { border: 1px solid rgba(34,197,94,.35); background: rgba(34,197,94,.14); color: #bbf7d0; border-radius: 999px; padding: 10px 14px; font-size: 12px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .content { padding: 24px 26px 34px; }
+    .panel { padding: 22px; }
+    .panel h3, .card h3 { margin: 0 0 6px; font-size: 24px; letter-spacing: -.03em; }
+    .hint { color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+    .card { padding: 18px; background: linear-gradient(180deg, rgba(22,34,53,.92), rgba(11,18,32,.92)); }
+    .card label, .field label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+    .value { font-size: 28px; font-weight: 950; letter-spacing: -.04em; }
+    .small { font-size: 16px; }
+    .muted { color: var(--muted); }
+    .divider { height: 1px; background: var(--line); margin: 20px 0; }
+    input, select, textarea { width: 100%; background: #0b1220; color: var(--text); border: 1px solid rgba(154,168,187,.28); border-radius: 14px; padding: 12px 13px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(56,189,248,.9); box-shadow: 0 0 0 3px rgba(56,189,248,.13); }
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; }
+    .wide { grid-column: span 2; }
+    .btn { border: 0; border-radius: 14px; background: var(--accent); color: #00121d; font-weight: 950; padding: 12px 15px; cursor: pointer; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn.secondary { background: rgba(148,163,184,.16); color: var(--text); border: 1px solid var(--line); }
+    .btn.danger { background: rgba(239,68,68,.16); color: #fecaca; border: 1px solid rgba(239,68,68,.35); }
+    .btn.success { background: var(--green); color: #03140a; }
+    .btn.small { padding: 8px 10px; font-size: 12px; }
+    .workspace { display: grid; grid-template-columns: 210px 1fr; gap: 18px; }
+    .subnav { padding: 10px; height: fit-content; }
+    .hidden { display: none !important; }
 
-<style>
-body {font-family: Arial; background:#0f172a; color:white; margin:0}
-.container {display:flex}
-.sidebar {width:200px; padding:20px; background:#020617}
-.sidebar button {display:block; width:100%; margin-bottom:10px; padding:10px; background:none; color:white; border:none; cursor:pointer}
-.main {flex:1; padding:20px}
-.card {background:#111827; padding:15px; margin-bottom:10px; border-radius:10px}
-input, select {width:100%; padding:8px; margin-top:5px}
-button.action {background:#22c55e; border:none; padding:10px; margin-top:10px; cursor:pointer}
-.timeline {margin-top:20px}
-.event {padding:10px; border-bottom:1px solid #334155}
-.negative {color:#ef4444}
-.module-btn {background:#1f2937; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer}
-</style>
+    .lock-screen { min-height: 520px; display: grid; place-items: center; }
+    .pin-card { width: min(430px, 100%); text-align: center; padding: 28px; background: rgba(11,18,32,.86); border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); }
+    .pin-card h3 { font-size: 28px; margin: 0 0 8px; }
+    .pin-card p { color: var(--muted); margin: 0 0 18px; }
+    .dots { display: flex; justify-content: center; gap: 10px; margin: 16px 0 20px; }
+    .dot { width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgba(154,168,187,.45); }
+    .dot.filled { background: var(--accent); border-color: var(--accent); }
+    .pinpad { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .pinpad button { border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--panel2); color: var(--text); font-weight: 950; font-size: 18px; cursor: pointer; }
+    .shake { animation: shake .36s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 50%{transform:translateX(10px)} 75%{transform:translateX(-7px)} }
+
+    .debt-list, .daily-groups { display: grid; gap: 12px; }
+    .debt-card { display: grid; grid-template-columns: 1.1fr .8fr .8fr .8fr .8fr auto; gap: 10px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 18px; background: rgba(11,18,32,.75); }
+    .badge { display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 950; color: #111827; background: var(--yellow); border-radius: 999px; padding: 4px 7px; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .metric { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid rgba(154,168,187,.14); }
+    .metric span:first-child { color: var(--muted); }
+    .metric strong { text-align: right; }
+    .strategic { padding: 15px; border-radius: 18px; border: 1px solid rgba(56,189,248,.24); background: rgba(56,189,248,.08); line-height: 1.55; }
+    .warning { padding: 14px; border-radius: 18px; border: 1px solid rgba(250,204,21,.28); background: rgba(250,204,21,.1); color: #fde68a; }
+    .danger-note { padding: 14px; border-radius: 18px; border: 1px solid rgba(239,68,68,.28); background: rgba(239,68,68,.1); color: #fecaca; }
+    .success-note { padding: 14px; border-radius: 18px; border: 1px solid rgba(34,197,94,.28); background: rgba(34,197,94,.1); color: #bbf7d0; }
+    .daily-group { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: rgba(11,18,32,.62); }
+    .daily-head { display: flex; justify-content: space-between; gap: 16px; padding: 14px 16px; background: rgba(148,163,184,.08); font-weight: 950; }
+    .daily-event { display: grid; grid-template-columns: 110px 1fr 120px 120px 150px auto; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid rgba(154,168,187,.12); }
+    .amount-plus { color: #86efac; font-weight: 950; }
+    .amount-minus { color: #fecaca; font-weight: 950; }
+    .balance-chip { font-weight: 900; padding: 6px 9px; border-radius: 999px; background: rgba(148,163,184,.12); display: inline-block; margin: 2px; }
+    .balance-chip.low { background: rgba(250,204,21,.13); color: #fde68a; }
+    .balance-chip.neg { background: rgba(239,68,68,.13); color: #fecaca; }
+    .progress-shell { height: 18px; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: rgba(148,163,184,.12); }
+    .progress-bar { height: 100%; background: linear-gradient(90deg,var(--accent),var(--green)); width: 0%; }
+    canvas { width: 100%; max-width: 100%; border: 1px solid var(--line); border-radius: 18px; background: rgba(11,18,32,.75); }
+
+    @media (max-width: 1000px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: static; }
+      .workspace { grid-template-columns: 1fr; }
+      .subnav { display: grid; grid-template-columns: repeat(3,1fr); }
+      .cards, .scenario-grid { grid-template-columns: repeat(2,1fr); }
+      .debt-card, .daily-event { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      .shell { width: calc(100% - 18px); margin: 9px auto; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .content { padding: 14px; }
+      .cards, .scenario-grid, .form-grid { grid-template-columns: 1fr; }
+      .wide { grid-column: auto; }
+      .subnav { grid-template-columns: 1fr 1fr; }
+      .sidebar { padding: 16px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Daily OS</h1>
+        <p>Private command center for daily planning and personal systems.</p>
+      </div>
+      <nav class="nav">
+        <button class="active" data-os="home">Home</button>
+        <button data-os="workspace">Workspace</button>
+        <button data-os="inbox">Inbox</button>
+        <button data-os="calendar">Calendar</button>
+      </nav>
+      <div class="sidebar-note">Private workspace data stays in this browser using <strong>localStorage</strong>. Default access PIN is <strong>1234</strong>.</div>
+    </aside>
 
-<div class="container">
-<div class="sidebar">
-<button onclick="setTab('home')">Home</button>
-<button onclick="setTab('workspace')">Workspace</button>
-</div>
-
-<div class="main" id="main"></div>
-</div>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="title">Daily Command Center</h2>
+          <p id="subtitle">Daily planning workspace.</p>
+        </div>
+        <button class="status-pill" id="statusBtn" onclick="statusClick()">OPEN WORKSPACE</button>
+      </header>
+      <section class="content">
+        <div id="homeArea"></div>
+        <div id="workspaceArea" class="hidden"></div>
+        <div id="inboxArea" class="hidden panel"><h3>Inbox</h3><p class="hint">Placeholder section. This stays separate from the private workspace.</p></div>
+        <div id="calendarArea" class="hidden panel"><h3>Calendar</h3><p class="hint">Placeholder section. This stays separate from the private workspace.</p></div>
+      </section>
+    </main>
+  </div>
 
 <script>
+const STORAGE_KEY = "dailyOS.privateWorkspace.v2";
+const PIN_KEY = "dailyOS.pin.v1";
 
-let tab = 'home'
-let unlocked = false
-let pin = '1234'
-let module = 'command' // command center vs cashflow
+function nextYearDate(){ const d = new Date(); d.setFullYear(d.getFullYear()+1); return d.toISOString().slice(0,10); }
+const defaults = {
+  overview: {
+    checking1Name: "Sofi", checking1: 0,
+    checking2Name: "USAA", checking2: 0,
+    checking3Name: "Emergency Cash", checking3: 0,
+    estimatedBonus: 55000, bonusTaxRate: 35,
+    k401: 0, homeEquity: 0, profitShare: 0
+  },
+  debts: [],
+  cashflow: [],
+  scenario: { bonusDebtPct: 70, bonusCarPct: 20, bonusCashPct: 10, monthlyExtraFromCarSavings: 500 },
+  carFund: { targetAmount: 30000, currentSaved: 0, monthlyContribution: 500, targetDate: nextYearDate() }
+};
+let data = loadData();
+let activeOS = "home";
+let activeTab = "overview";
+let unlocked = false;
+let pinEntry = "";
 
-let data = JSON.parse(localStorage.getItem('cfData')) || {
-accounts:[
-{id:'sofi',name:'Sofi',balance:1376},
-{id:'usaa',name:'USAA',balance:404}
-],
-events:[]
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function merge(base, saved){
+  for (const k in saved || {}) {
+    if (saved[k] && typeof saved[k] === "object" && !Array.isArray(saved[k])) base[k] = merge(base[k] || {}, saved[k]);
+    else base[k] = saved[k];
+  }
+  return base;
 }
+function loadData(){ try { return merge(clone(defaults), JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch { return clone(defaults); } }
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function getPin(){ return localStorage.getItem(PIN_KEY) || "1234"; }
+function setPin(pin){ localStorage.setItem(PIN_KEY, pin); }
+function money(v){ return (Number(v)||0).toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}); }
+function money2(v){ return (Number(v)||0).toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}); }
+function pct(v){ return `${(Number(v)||0).toFixed(2)}%`; }
+function esc(s){ return String(s ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
 
-function save(){localStorage.setItem('cfData',JSON.stringify(data))}
-
-function setTab(t){tab=t; render()}
+function totalCash(){ const o=data.overview; return Number(o.checking1)+Number(o.checking2)+Number(o.checking3); }
+function totalDebt(){ return data.debts.reduce((s,d)=>s+Number(d.balance||0),0); }
+function totalMins(){ return data.debts.reduce((s,d)=>s+Number(d.minPayment||0),0); }
+function netBonus(){ return Number(data.overview.estimatedBonus||0)*(1-Number(data.overview.bonusTaxRate||0)/100); }
+function lockedWealth(){ const o=data.overview; return Number(o.k401)+Number(o.homeEquity)+Number(o.profitShare); }
+function sortedDebts(){ return [...data.debts].sort((a,b)=>Number(b.rate||0)-Number(a.rate||0)); }
+function accounts(){
+  const o=data.overview;
+  return [
+    { id:"checking1", name:o.checking1Name || "Account 1", start:Number(o.checking1||0) },
+    { id:"checking2", name:o.checking2Name || "Account 2", start:Number(o.checking2||0) },
+    { id:"checking3", name:o.checking3Name || "Account 3", start:Number(o.checking3||0) }
+  ];
+}
 
 function render(){
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active", b.dataset.os===activeOS));
+  document.getElementById("homeArea").classList.toggle("hidden", activeOS!=="home");
+  document.getElementById("workspaceArea").classList.toggle("hidden", activeOS!=="workspace");
+  document.getElementById("inboxArea").classList.toggle("hidden", activeOS!=="inbox");
+  document.getElementById("calendarArea").classList.toggle("hidden", activeOS!=="calendar");
+  document.getElementById("title").textContent = activeOS==="workspace" ? "Workspace" : activeOS==="home" ? "Daily Command Center" : activeOS[0].toUpperCase()+activeOS.slice(1);
+  document.getElementById("subtitle").textContent = activeOS==="workspace" ? "Secure personal workspace." : activeOS==="home" ? "Daily planning workspace." : "Placeholder workspace.";
+  document.getElementById("statusBtn").textContent = activeOS==="workspace" ? (unlocked ? "LOCK WORKSPACE" : "READY") : activeOS==="home" ? "OPEN WORKSPACE" : "OPEN";
+  if (activeOS==="home") renderHome();
+  if (activeOS==="workspace") renderWorkspace();
+}
+function statusClick(){ if(activeOS==="home") { activeOS="workspace"; render(); } else if(activeOS==="workspace" && unlocked) { unlocked=false; render(); } }
 
-// HOME (decoy)
-if(tab==='home'){
-document.getElementById('main').innerHTML=`
-<h2>Daily Command Center</h2>
-<p>Personal planning workspace</p>
-<button class='action' onclick="setTab('workspace')">Open Workspace</button>
-`
+function renderHome(){
+  document.getElementById("homeArea").innerHTML = `
+    <div class="panel">
+      <h3>Today’s Operating View</h3>
+      <p class="hint">A lightweight daily workspace for reminders, priorities, and planning. Sensitive workspaces are separated behind their own controls.</p>
+      <div class="cards">
+        <div class="card"><label>Top Priority</label><input placeholder="Enter today’s main focus"></div>
+        <div class="card"><label>Open Loops</label><div class="value small">Manual</div><p class="hint">Placeholder planning view</p></div>
+        <div class="card"><label>Upcoming</label><div class="value small">Not connected</div><p class="hint">Calendar placeholder</p></div>
+        <div class="card"><label>Workspace</label><button class="btn secondary" onclick="activeOS='workspace'; render();">Open Workspace</button></div>
+      </div>
+    </div>`;
 }
 
-// WORKSPACE
-if(tab==='workspace'){
-
-// PIN SCREEN
-if(!unlocked){
-document.getElementById('main').innerHTML=`
-<h2>Enter PIN</h2>
-<input id='pinInput' type='password'>
-<button class='action' onclick='unlock()'>Enter</button>
-`
+function renderWorkspace(){
+  const area=document.getElementById("workspaceArea");
+  if(!unlocked){ area.innerHTML = lockHTML(); updateDots(); return; }
+  area.innerHTML = `
+    <div class="workspace">
+      <nav class="subnav">
+        ${["overview","cashflow","debts","scenarios","carFund","settings"].map(t=>`<button class="${activeTab===t?'active':''}" onclick="activeTab='${t}'; render();">${tabLabel(t)}</button>`).join("")}
+      </nav>
+      <div class="panel" id="tabPanel"></div>
+    </div>`;
+  const p=document.getElementById("tabPanel");
+  if(activeTab==="overview") p.innerHTML=overviewHTML();
+  if(activeTab==="cashflow") p.innerHTML=cashflowHTML();
+  if(activeTab==="debts") p.innerHTML=debtsHTML();
+  if(activeTab==="scenarios") p.innerHTML=scenariosHTML();
+  if(activeTab==="carFund") { p.innerHTML=carHTML(); setTimeout(drawCarChart,0); }
+  if(activeTab==="settings") p.innerHTML=settingsHTML();
 }
+function tabLabel(t){ return ({overview:"Financial Center",cashflow:"Cash Flow",debts:"Debts",scenarios:"Scenarios",carFund:"Car Fund",settings:"Settings"})[t]; }
 
-// AFTER PIN
-else{
+function lockHTML(){ return `
+  <div class="lock-screen"><div class="pin-card" id="pinCard">
+    <h3>Workspace Locked</h3><p>Enter your 4-digit PIN to continue.</p>
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="pinpad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="pressPin('${n}')">${n}</button>`).join("")}<button onclick="clearPin()">Clear</button><button onclick="pressPin('0')">0</button><button onclick="backPin()">⌫</button></div>
+  </div></div>`; }
+function updateDots(){ document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("filled", i<pinEntry.length)); }
+function pressPin(n){ pinEntry+=n; updateDots(); if(pinEntry.length===4){ if(pinEntry===getPin()){ unlocked=true; pinEntry=""; activeTab="overview"; render(); } else { const c=document.getElementById("pinCard"); c.classList.add("shake"); setTimeout(()=>{pinEntry=""; c.classList.remove("shake"); updateDots();},380); } } }
+function clearPin(){ pinEntry=""; updateDots(); }
+function backPin(){ pinEntry=pinEntry.slice(0,-1); updateDots(); }
 
-// COMMAND CENTER (landing page)
-if(module==='command'){
-document.getElementById('main').innerHTML=`
-<h2>Financial Command Center</h2>
+function overviewHTML(){ const o=data.overview; const cf=projectCashflow(); return `
+  <h3>Financial Command Center</h3><p class="hint">This is the landing page after the PIN. Use Cash Flow for future line-item planning, and the other tabs for debt, bonus, and savings strategy.</p>
+  <div class="cards">
+    <div class="card"><label>Total Liquid Cash</label><div class="value">${money(totalCash())}</div><p class="hint">Current starting balances</p></div>
+    <div class="card"><label>Projected Cash End</label><div class="value">${money(cf.endingTotal)}</div><p class="hint">After cash flow events</p></div>
+    <div class="card"><label>Total Debt</label><div class="value">${money(totalDebt())}</div><p class="hint">Across debt cards</p></div>
+    <div class="card"><label>Estimated Net Bonus</label><div class="value">${money(netBonus())}</div><p class="hint">After estimated tax</p></div>
+  </div>
+  <div class="divider"></div>
+  <div class="cards">
+    ${accounts().map(a=>`<div class="card"><label>${esc(a.name)} Starting Balance</label><input type="number" value="${a.start}" onchange="updatePath('overview.${a.id}', this.value)"></div>`).join("")}
+    <div class="card"><label>Locked / Contingent Wealth</label><div class="value">${money(lockedWealth())}</div></div>
+  </div>
+  <div class="divider"></div>
+  <h3>Account Names + Bonus</h3>
+  <div class="form-grid">
+    <div class="field"><label>Account 1 Name</label><input value="${esc(o.checking1Name)}" onchange="updatePath('overview.checking1Name', this.value)"></div>
+    <div class="field"><label>Account 2 Name</label><input value="${esc(o.checking2Name)}" onchange="updatePath('overview.checking2Name', this.value)"></div>
+    <div class="field"><label>Account 3 Name</label><input value="${esc(o.checking3Name)}" onchange="updatePath('overview.checking3Name', this.value)"></div>
+    <div class="field"><label>Gross Bonus</label><input type="number" value="${o.estimatedBonus}" onchange="updatePath('overview.estimatedBonus', this.value)"></div>
+    <div class="field"><label>Bonus Tax Rate %</label><input type="number" value="${o.bonusTaxRate}" onchange="updatePath('overview.bonusTaxRate', this.value)"></div>
+    <div class="field"><label>401k Estimate</label><input type="number" value="${o.k401}" onchange="updatePath('overview.k401', this.value)"></div>
+    <div class="field"><label>Home Equity</label><input type="number" value="${o.homeEquity}" onchange="updatePath('overview.homeEquity', this.value)"></div>
+    <div class="field"><label>Profit Share</label><input type="number" value="${o.profitShare}" onchange="updatePath('overview.profitShare', this.value)"></div>
+  </div>
+  <div class="divider"></div>
+  <button class="btn success" onclick="activeTab='cashflow'; render();">Open Cash Flow Ledger</button>`; }
 
-<div class='card'>
-<h3>Modules</h3>
-
-<div class='module-btn' onclick="openCashFlow()">Cash Flow</div>
-
-<div class='module-btn'>Debts (coming)</div>
-<div class='module-btn'>Scenarios (coming)</div>
-<div class='module-btn'>Investments (coming)</div>
-
-</div>
-`
+function cashflowHTML(){ const proj=projectCashflow(); const acct=accounts(); return `
+  <h3>Cash Flow Ledger</h3>
+  <p class="hint">Enter future line-item charges, paychecks, bills, and transfers. The timeline shows each event and the running balance after that line.</p>
+  <div class="cards">
+    <div class="card"><label>Starting Cash</label><div class="value">${money(totalCash())}</div></div>
+    <div class="card"><label>Projected Ending Cash</label><div class="value">${money(proj.endingTotal)}</div></div>
+    <div class="card"><label>Lowest Projected Balance</label><div class="value">${money(proj.lowestTotal)}</div><p class="hint">Across all accounts combined</p></div>
+    <div class="card"><label>Events</label><div class="value">${data.cashflow.length}</div></div>
+  </div>
+  <div class="divider"></div>
+  <h3>Add Line Item</h3>
+  <div class="form-grid">
+    <div class="field"><label>Date</label><input id="cfDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+    <div class="field wide"><label>Description</label><input id="cfDesc" placeholder="Mortgage, Groceries, Paycheck, Transfer"></div>
+    <div class="field"><label>Amount</label><input id="cfAmount" type="number" step="0.01" placeholder="225.00"></div>
+    <div class="field"><label>Account</label><select id="cfAccount">${acct.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></div>
+    <div class="field"><label>Type</label><select id="cfType" onchange="toggleTransferFields()"><option value="income">Income</option><option value="expense">Expense / Bill</option><option value="transfer">Transfer</option></select></div>
+    <div class="field" id="toAccountWrap" style="display:none"><label>To Account</label><select id="cfToAccount">${acct.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></div>
+    <button class="btn success" onclick="addCashflowEvent()">Add Event</button>
+  </div>
+  <div class="divider"></div>
+  ${cashflowInsights(proj)}
+  <div class="divider"></div>
+  <h3>Timeline</h3>
+  <div class="daily-groups">${timelineHTML(proj)}</div>`; }
+function toggleTransferFields(){ const el=document.getElementById("toAccountWrap"); if(el) el.style.display = document.getElementById("cfType").value==="transfer" ? "block" : "none"; }
+function addCashflowEvent(){
+  const date=document.getElementById("cfDate").value;
+  const desc=document.getElementById("cfDesc").value.trim();
+  const amount=Number(document.getElementById("cfAmount").value||0);
+  const account=document.getElementById("cfAccount").value;
+  const type=document.getElementById("cfType").value;
+  const toAccount=document.getElementById("cfToAccount")?.value;
+  if(!date || !desc || amount<=0) return alert("Add a date, description, and positive amount.");
+  if(type==="transfer" && account===toAccount) return alert("Transfer needs two different accounts.");
+  data.cashflow.push({id:crypto.randomUUID(), date, desc, amount, account, type, toAccount: type==="transfer" ? toAccount : null});
+  saveData(); render();
 }
-
-// CASH FLOW MODULE
-if(module==='cashflow'){
-document.getElementById('main').innerHTML=cashflowHTML()
-renderTimeline()
+function deleteCashflow(id){ data.cashflow=data.cashflow.filter(e=>e.id!==id); saveData(); render(); }
+function projectCashflow(){
+  const acct=accounts();
+  const balances={}; acct.forEach(a=>balances[a.id]=a.start);
+  let lowestTotal=acct.reduce((s,a)=>s+a.start,0);
+  const events=[...data.cashflow].sort((a,b)=> new Date(a.date)-new Date(b.date) || a.desc.localeCompare(b.desc));
+  const projected=[];
+  for(const e of events){
+    if(e.type==="income") balances[e.account]+=Number(e.amount||0);
+    if(e.type==="expense") balances[e.account]-=Number(e.amount||0);
+    if(e.type==="transfer") { balances[e.account]-=Number(e.amount||0); balances[e.toAccount]+=Number(e.amount||0); }
+    const snapshot=clone(balances);
+    const total=Object.values(snapshot).reduce((s,v)=>s+Number(v||0),0);
+    lowestTotal=Math.min(lowestTotal,total);
+    projected.push({...e, balances:snapshot, total});
+  }
+  return { events: projected, endingBalances: balances, endingTotal:Object.values(balances).reduce((s,v)=>s+Number(v||0),0), lowestTotal };
 }
-
+function cashflowInsights(proj){
+  const lows=[]; const acct=accounts();
+  proj.events.forEach(e=>acct.forEach(a=>{ if(e.balances[a.id]<0) lows.push(`${a.name} goes negative after ${e.desc} on ${e.date}`); }));
+  if(lows.length) return `<div class="danger-note"><strong>Cash flow warning:</strong> ${esc(lows[0])}.</div>`;
+  if(data.cashflow.length===0) return `<div class="warning">No future line items yet. Add upcoming paychecks, bills, charges, and transfers to begin forecasting.</div>`;
+  return `<div class="success-note">No negative account balances detected in the current timeline.</div>`;
 }
-
+function timelineHTML(proj){
+  if(!proj.events.length) return `<div class="warning">No cash flow events yet.</div>`;
+  const acct=accounts();
+  const groups={}; proj.events.forEach(e=>{ (groups[e.date] ||= []).push(e); });
+  return Object.keys(groups).map(date=>`
+    <div class="daily-group">
+      <div class="daily-head"><span>${date}</span><span>${groups[date].length} line item${groups[date].length>1?'s':''}</span></div>
+      ${groups[date].map(e=>`
+        <div class="daily-event">
+          <div><strong>${esc(e.type)}</strong></div>
+          <div>${esc(e.desc)}${e.type==="transfer" ? ` <span class="muted">(${accountName(e.account)} → ${accountName(e.toAccount)})</span>` : ` <span class="muted">(${accountName(e.account)})</span>`}</div>
+          <div class="${e.type==='income'?'amount-plus':'amount-minus'}">${e.type==='income'?'+':'-'}${money2(e.amount)}</div>
+          <div><span class="muted">Total</span><br><strong>${money2(e.total)}</strong></div>
+          <div>${acct.map(a=>`<span class="balance-chip ${e.balances[a.id]<0?'neg':e.balances[a.id]<500?'low':''}">${esc(a.name)} ${money2(e.balances[a.id])}</span>`).join(" ")}</div>
+          <button class="btn danger small" onclick="deleteCashflow('${e.id}')">Delete</button>
+        </div>`).join("")}
+    </div>`).join("");
 }
+function accountName(id){ return accounts().find(a=>a.id===id)?.name || id; }
 
+function debtsHTML(){ const debts=sortedDebts(); return `
+  <h3>Debts</h3><p class="hint">Add balances, rates, and minimum payments. Highest rate sorts first.</p>
+  <div class="form-grid"><div class="field"><label>Name</label><input id="debtName"></div><div class="field"><label>Balance</label><input id="debtBalance" type="number"></div><div class="field"><label>Rate %</label><input id="debtRate" type="number" step="0.01"></div><div class="field"><label>Minimum</label><input id="debtMin" type="number"></div><div class="field wide"><label>Notes</label><input id="debtNotes"></div><button class="btn success" onclick="addDebt()">Add Debt</button></div>
+  <div class="divider"></div><div class="debt-list">${debts.length?debts.map((d,i)=>`<div class="debt-card"><div><strong>${esc(d.name)}</strong>${i===0?'<span class="badge">HIGHEST RATE</span>':''}<p class="hint">${esc(d.notes||'No notes')}</p></div><div><span class="muted">Balance</span><br><strong>${money2(d.balance)}</strong></div><div><span class="muted">Rate</span><br><strong>${pct(d.rate)}</strong></div><div><span class="muted">Min</span><br><strong>${money2(d.minPayment)}</strong></div><div><span class="muted">Monthly Interest</span><br><strong>${money2(monthlyInterest(d))}</strong></div><button class="btn danger small" onclick="deleteDebt('${d.id}')">Delete</button></div>`).join(""):'<div class="warning">No debts added yet.</div>'}</div>`; }
+function monthlyInterest(d){ return Number(d.balance||0)*(Number(d.rate||0)/100)/12; }
+function addDebt(){ const name=document.getElementById("debtName").value.trim(); const balance=Number(document.getElementById("debtBalance").value||0); const rate=Number(document.getElementById("debtRate").value||0); const minPayment=Number(document.getElementById("debtMin").value||0); const notes=document.getElementById("debtNotes").value.trim(); if(!name||balance<=0)return alert("Add name and balance."); data.debts.push({id:crypto.randomUUID(),name,balance,rate,minPayment,notes}); saveData(); render(); }
+function deleteDebt(id){ data.debts=data.debts.filter(d=>d.id!==id); saveData(); render(); }
+
+function simulate(lump, extra){
+  let debts=sortedDebts().map(d=>({...d,balance:Number(d.balance||0),rate:Number(d.rate||0),minPayment:Number(d.minPayment||0)}));
+  let l=Number(lump||0); for(const d of debts){ const p=Math.min(d.balance,l); d.balance-=p; l-=p; if(l<=0)break; }
+  debts=debts.filter(d=>d.balance>.01); const start=debts.reduce((s,d)=>s+d.balance,0); const monthly=totalMins()+Number(extra||0);
+  if(!debts.length) return {months:0, text:"Immediate", interest:0, start, monthly};
+  if(monthly<=0) return {months:Infinity, text:"No payoff path", interest:0, start, monthly};
+  let months=0, interest=0;
+  while(debts.reduce((s,d)=>s+d.balance,0)>.01 && months<1200){ months++; for(const d of debts){ const i=d.balance*(d.rate/100)/12; d.balance+=i; interest+=i; } let avail=monthly; for(const d of debts){ const p=Math.min(d.balance,d.minPayment); d.balance-=p; avail-=p; } debts.sort((a,b)=>b.rate-a.rate); for(const d of debts){ if(avail<=0)break; const p=Math.min(d.balance,avail); d.balance-=p; avail-=p; } debts=debts.filter(d=>d.balance>.01); }
+  return {months, text:months>=1200?"100+ years":`${months} mo`, interest, start, monthly};
 }
+function scenariosHTML(){ const s=data.scenario; const bonusDebt=netBonus()*s.bonusDebtPct/100; const min=simulate(0,0), bonus=simulate(bonusDebt,0), redirect=simulate(bonusDebt,s.monthlyExtraFromCarSavings); return `
+  <h3>Scenarios</h3><p class="hint">Debt avalanche comparison using highest-rate-first logic.</p>
+  <div class="cards"><div class="card"><label>Net Bonus</label><div class="value">${money(netBonus())}</div></div><div class="card"><label>Debt Allocation</label><div class="value">${money(bonusDebt)}</div></div><div class="card"><label>Monthly Redirect</label><input type="number" value="${s.monthlyExtraFromCarSavings}" onchange="updatePath('scenario.monthlyExtraFromCarSavings', this.value)"></div><div class="card"><label>Debt Allocation %</label><input type="number" value="${s.bonusDebtPct}" onchange="updatePath('scenario.bonusDebtPct', this.value)"></div></div>
+  <div class="divider"></div><div class="scenario-grid">${scenarioCard('Minimums Only',min)}${scenarioCard('Bonus to Debt',bonus)}${scenarioCard('Bonus + Redirect',redirect)}</div>
+  <div class="divider"></div><div class="strategic"><strong>Strategic read:</strong> Applying bonus dollars to the highest-rate debt first reduces interest drag. Redirecting monthly cash creates the strongest timeline compression.</div>`; }
+function scenarioCard(title,r){ return `<div class="card"><h3>${title}</h3><div class="metric"><span>Months</span><strong>${r.text}</strong></div><div class="metric"><span>Interest</span><strong>${money2(r.interest)}</strong></div><div class="metric"><span>Starting Debt</span><strong>${money2(r.start)}</strong></div><div class="metric"><span>Monthly Power</span><strong>${money2(r.monthly)}</strong></div></div>`; }
 
-// PIN unlock
-function unlock(){
-if(document.getElementById('pinInput').value===pin){
-unlocked=true
-render()
-}else{
-alert('Wrong PIN')
-}
-}
+function carHTML(){ const c=data.carFund; const m=monthsUntil(c.targetDate); const projected=Number(c.currentSaved)+Number(c.monthlyContribution)*m; const needed=m>0?Math.max(0,(Number(c.targetAmount)-Number(c.currentSaved))/m):0; const gap=Number(c.targetAmount)-projected; const progress=Number(c.targetAmount)>0?Math.min(100,Number(c.currentSaved)/Number(c.targetAmount)*100):0; return `
+  <h3>Car Fund</h3><p class="hint">Track vehicle savings goal and projected shortfall.</p>
+  <div class="form-grid"><div class="field"><label>Target</label><input type="number" value="${c.targetAmount}" onchange="updatePath('carFund.targetAmount', this.value)"></div><div class="field"><label>Saved</label><input type="number" value="${c.currentSaved}" onchange="updatePath('carFund.currentSaved', this.value)"></div><div class="field"><label>Monthly</label><input type="number" value="${c.monthlyContribution}" onchange="updatePath('carFund.monthlyContribution', this.value)"></div><div class="field"><label>Target Date</label><input type="date" value="${c.targetDate}" onchange="updatePath('carFund.targetDate', this.value)"></div></div>
+  <div class="divider"></div><div class="cards"><div class="card"><label>Months</label><div class="value">${m}</div></div><div class="card"><label>Projected</label><div class="value">${money(projected)}</div></div><div class="card"><label>Needed Monthly</label><div class="value">${money(needed)}</div></div><div class="card"><label>Gap</label><div class="value">${money(Math.max(0,gap))}</div></div></div>
+  <div class="divider"></div><div class="progress-shell"><div class="progress-bar" style="width:${progress}%"></div></div><div class="divider"></div>${gap>0?`<div class="warning">Projected shortfall: ${money(gap)}.</div>`:`<div class="success-note">Projected to meet or exceed goal.</div>`}<div class="divider"></div><canvas id="carChart" width="900" height="320"></canvas>`; }
+function monthsUntil(date){ const t=new Date(date+"T00:00:00"), n=new Date(); return Math.max(0,(t.getFullYear()-n.getFullYear())*12+(t.getMonth()-n.getMonth())); }
+function drawCarChart(){ const canvas=document.getElementById("carChart"); if(!canvas)return; const ctx=canvas.getContext("2d"), c=data.carFund, m=Math.max(1,monthsUntil(c.targetDate)), cur=Number(c.currentSaved), mon=Number(c.monthlyContribution), target=Number(c.targetAmount); const vals=[]; for(let i=0;i<=m;i++) vals.push(cur+mon*i); const max=Math.max(target,...vals,1), left=55, top=50, w=canvas.width-80, h=canvas.height-95; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#e5e7eb"; ctx.font="14px system-ui"; ctx.fillText("Car Fund Projection",24,28); ctx.strokeStyle="rgba(154,168,187,.35)"; ctx.beginPath(); ctx.moveTo(left,top); ctx.lineTo(left,top+h); ctx.lineTo(left+w,top+h); ctx.stroke(); vals.forEach((v,i)=>{ const x=left+i*(w/Math.max(1,vals.length-1)); const bh=v/max*h; ctx.fillStyle=i===0?"rgba(56,189,248,.72)":"rgba(34,197,94,.72)"; ctx.fillRect(x-5,top+h-bh,10,bh); }); const y=top+h-target/max*h; ctx.strokeStyle="rgba(250,204,21,.9)"; ctx.setLineDash([8,6]); ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(left+w,y); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle="#fde68a"; ctx.fillText(`Target ${money(target)}`,left+8,Math.max(18,y-8)); }
 
-// NAV FUNCTIONS
-function openCashFlow(){
-module='cashflow'
-render()
-}
+function settingsHTML(){ return `
+  <h3>Settings</h3><p class="hint">Manage PIN and local data.</p>
+  <div class="cards"><div class="card"><label>Change PIN</label><input id="newPin" maxlength="4" inputmode="numeric" placeholder="4 digits"><br><br><button class="btn" onclick="changePin()">Save PIN</button></div><div class="card"><label>Export</label><p class="hint">Download JSON backup.</p><button class="btn secondary" onclick="exportData()">Export JSON</button></div><div class="card"><label>Import</label><p class="hint">Restore from JSON backup.</p><input type="file" accept="application/json" onchange="importData(this.files[0])"></div><div class="card"><label>Reset</label><p class="hint">Clear this browser's local data.</p><button class="btn danger" onclick="resetData()">Reset Everything</button></div></div>`; }
+function changePin(){ const p=document.getElementById("newPin").value.trim(); if(!/^\d{4}$/.test(p)) return alert("PIN must be 4 digits."); setPin(p); alert("PIN updated."); }
+function exportData(){ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`daily-os-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href); }
+function importData(file){ if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ data=merge(clone(defaults),JSON.parse(reader.result)); saveData(); render(); alert("Import complete."); }catch{ alert("Could not import that file."); } }; reader.readAsText(file); }
+function resetData(){ if(!confirm("Reset all local workspace data?"))return; data=clone(defaults); saveData(); render(); }
 
-function backToCommand(){
-module='command'
-render()
-}
+function updatePath(path,value){ const parts=path.split('.'); let obj=data; for(let i=0;i<parts.length-1;i++) obj=obj[parts[i]]; const key=parts.at(-1); const numeric=new Set(["checking1","checking2","checking3","estimatedBonus","bonusTaxRate","k401","homeEquity","profitShare","monthlyExtraFromCarSavings","bonusDebtPct","targetAmount","currentSaved","monthlyContribution"]); obj[key]=numeric.has(key)?Number(value||0):value; saveData(); render(); }
 
-// CASH FLOW UI
-function cashflowHTML(){
-return `
-<h2>Cash Flow</h2>
-
-<button class='action' onclick='backToCommand()'>← Back</button>
-
-<div class='card'>
-<label>Date</label>
-<input id='date' type='date'>
-
-<label>Description</label>
-<input id='desc' placeholder='Groceries, Mortgage, etc.'>
-
-<label>Amount</label>
-<input id='amount' type='number'>
-
-<label>Account</label>
-<select id='account'>
-${data.accounts.map(a=>`<option value='${a.id}'>${a.name}</option>`).join('')}
-</select>
-
-<label>Type</label>
-<select id='type'>
-<option value='income'>Income</option>
-<option value='expense'>Expense</option>
-</select>
-
-<button class='action' onclick='addEvent()'>Add Event</button>
-</div>
-
-<div class='timeline' id='timeline'></div>
-`
-}
-
-// ADD EVENT
-function addEvent(){
-let e={
-id:Date.now(),
-date:document.getElementById('date').value,
-description:document.getElementById('desc').value,
-amount:Number(document.getElementById('amount').value),
-account:document.getElementById('account').value,
-type:document.getElementById('type').value
-}
-
-data.events.push(e)
-save()
-render()
-}
-
-// TIMELINE ENGINE (THIS IS YOUR SPREADSHEET LOGIC)
-function renderTimeline(){
-
-let events=[...data.events].sort((a,b)=>new Date(a.date)-new Date(b.date))
-
-let balances={}
-data.accounts.forEach(a=>balances[a.id]=a.balance)
-
-let html=''
-
-events.forEach(e=>{
-
-if(e.type==='income') balances[e.account]+=e.amount
-if(e.type==='expense') balances[e.account]-=e.amount
-
-html+=`
-<div class='event'>
-<strong>${e.date}</strong> - ${e.description}<br>
-${e.type==='income'?'+':'-'}$${e.amount}<br>
-Balance (${e.account}): 
-<span class='${balances[e.account]<0?'negative':''}'>
-$${balances[e.account].toFixed(2)}
-</span>
-</div>
-`
-})
-
-document.getElementById('timeline').innerHTML=
-html || "<p>No events yet</p>"
-}
-
-render()
-
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{ activeOS=b.dataset.os; render(); }));
+document.addEventListener("keydown",e=>{ if(activeOS==="workspace"&&!unlocked){ if(/^\d$/.test(e.key)) pressPin(e.key); if(e.key==="Backspace") backPin(); if(e.key==="Escape") clearPin(); } });
+saveData(); render();
 </script>
-
 </body>
 </html>

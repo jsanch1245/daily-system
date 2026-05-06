@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily OS</title>
+  <title>Daily OS V2</title>
   <style>
     :root {
-      --bg: #08111f;
+      --bg: #07111f;
       --panel: #101827;
-      --panel2: #162235;
+      --panel2: #172236;
       --card: #0b1220;
       --text: #eef2f7;
       --muted: #9aa8bb;
@@ -17,6 +17,7 @@
       --green: #22c55e;
       --yellow: #facc15;
       --red: #ef4444;
+      --purple: #a78bfa;
       --radius: 22px;
       --shadow: 0 20px 45px rgba(0,0,0,.35);
     }
@@ -24,64 +25,52 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top left, #18263c 0%, #08111f 46%, #020617 100%);
+      background: radial-gradient(circle at top left, #1c2b45 0%, #07111f 47%, #020617 100%);
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     button, input, select, textarea { font: inherit; }
-    .shell {
-      width: min(1380px, calc(100% - 32px));
-      margin: 22px auto;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 18px;
-    }
-    .sidebar, .main, .panel, .card, .subnav {
-      background: rgba(16,24,39,.9);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+    .shell { width: min(1440px, calc(100% - 32px)); margin: 22px auto; display: grid; grid-template-columns: 270px 1fr; gap: 18px; }
+    .sidebar, .main, .panel, .card, .subnav { background: rgba(16,24,39,.92); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
     .sidebar { padding: 20px; height: calc(100vh - 44px); position: sticky; top: 22px; }
-    .brand h1 { margin: 0 0 8px; font-size: 24px; }
+    .brand h1 { margin: 0 0 8px; font-size: 24px; letter-spacing: -.03em; }
     .brand p { margin: 0 0 24px; color: var(--muted); line-height: 1.45; font-size: 14px; }
-    .nav button, .subnav button {
-      width: 100%; border: 0; cursor: pointer; color: var(--text); background: transparent;
-      text-align: left; border-radius: 16px; padding: 13px 14px; font-weight: 800; margin-bottom: 6px;
-    }
+    .nav button, .subnav button { width: 100%; border: 0; cursor: pointer; color: var(--text); background: transparent; text-align: left; border-radius: 16px; padding: 13px 14px; font-weight: 850; margin-bottom: 6px; }
     .nav button:hover, .subnav button:hover { background: rgba(148,163,184,.12); }
     .nav button.active, .subnav button.active { background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(34,197,94,.12)); }
     .sidebar-note { margin-top: 22px; border: 1px dashed rgba(154,168,187,.35); border-radius: 18px; padding: 15px; color: var(--muted); line-height: 1.45; font-size: 13px; }
     .main { min-height: calc(100vh - 44px); overflow: hidden; }
     .topbar { padding: 22px 26px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-    .topbar h2 { margin: 0; font-size: clamp(26px, 4vw, 42px); letter-spacing: -.04em; }
+    .topbar h2 { margin: 0; font-size: clamp(26px, 4vw, 42px); letter-spacing: -.045em; }
     .topbar p { margin: 5px 0 0; color: var(--muted); }
-    .status-pill { border: 1px solid rgba(34,197,94,.35); background: rgba(34,197,94,.14); color: #bbf7d0; border-radius: 999px; padding: 10px 14px; font-size: 12px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .status-pill { border: 1px solid rgba(34,197,94,.35); background: rgba(34,197,94,.14); color: #bbf7d0; border-radius: 999px; padding: 10px 14px; font-size: 12px; font-weight: 950; cursor: pointer; white-space: nowrap; }
     .content { padding: 24px 26px 34px; }
     .panel { padding: 22px; }
-    .panel h3, .card h3 { margin: 0 0 6px; font-size: 24px; letter-spacing: -.03em; }
+    .panel h3, .card h3 { margin: 0 0 6px; font-size: 23px; letter-spacing: -.03em; }
     .hint { color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
     .cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
-    .card { padding: 18px; background: linear-gradient(180deg, rgba(22,34,53,.92), rgba(11,18,32,.92)); }
-    .card label, .field label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
-    .value { font-size: 28px; font-weight: 950; letter-spacing: -.04em; }
+    .card { padding: 18px; background: linear-gradient(180deg, rgba(23,34,54,.94), rgba(11,18,32,.94)); }
+    .card label, .field label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .05em; }
+    .value { font-size: 28px; font-weight: 950; letter-spacing: -.045em; }
     .small { font-size: 16px; }
     .muted { color: var(--muted); }
     .divider { height: 1px; background: var(--line); margin: 20px 0; }
     input, select, textarea { width: 100%; background: #0b1220; color: var(--text); border: 1px solid rgba(154,168,187,.28); border-radius: 14px; padding: 12px 13px; outline: none; }
+    textarea { min-height: 86px; resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: rgba(56,189,248,.9); box-shadow: 0 0 0 3px rgba(56,189,248,.13); }
     .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; }
     .wide { grid-column: span 2; }
+    .full { grid-column: 1 / -1; }
     .btn { border: 0; border-radius: 14px; background: var(--accent); color: #00121d; font-weight: 950; padding: 12px 15px; cursor: pointer; }
     .btn:hover { filter: brightness(1.08); }
     .btn.secondary { background: rgba(148,163,184,.16); color: var(--text); border: 1px solid var(--line); }
     .btn.danger { background: rgba(239,68,68,.16); color: #fecaca; border: 1px solid rgba(239,68,68,.35); }
     .btn.success { background: var(--green); color: #03140a; }
+    .btn.purple { background: rgba(167,139,250,.22); color: #ddd6fe; border: 1px solid rgba(167,139,250,.36); }
     .btn.small { padding: 8px 10px; font-size: 12px; }
-    .workspace { display: grid; grid-template-columns: 210px 1fr; gap: 18px; }
+    .workspace { display: grid; grid-template-columns: 220px 1fr; gap: 18px; }
     .subnav { padding: 10px; height: fit-content; }
     .hidden { display: none !important; }
-
     .lock-screen { min-height: 520px; display: grid; place-items: center; }
     .pin-card { width: min(430px, 100%); text-align: center; padding: 28px; background: rgba(11,18,32,.86); border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); }
     .pin-card h3 { font-size: 28px; margin: 0 0 8px; }
@@ -93,39 +82,39 @@
     .pinpad button { border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--panel2); color: var(--text); font-weight: 950; font-size: 18px; cursor: pointer; }
     .shake { animation: shake .36s ease; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 50%{transform:translateX(10px)} 75%{transform:translateX(-7px)} }
-
-    .debt-list, .daily-groups { display: grid; gap: 12px; }
-    .debt-card { display: grid; grid-template-columns: 1.1fr .8fr .8fr .8fr .8fr auto; gap: 10px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 18px; background: rgba(11,18,32,.75); }
-    .badge { display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 950; color: #111827; background: var(--yellow); border-radius: 999px; padding: 4px 7px; }
+    .list { display: grid; gap: 12px; }
+    .row-card { display: grid; grid-template-columns: 1.2fr .8fr .8fr .8fr auto; gap: 10px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 18px; background: rgba(11,18,32,.75); }
+    .daily-group { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: rgba(11,18,32,.62); }
+    .daily-head { display: flex; justify-content: space-between; gap: 16px; padding: 14px 16px; background: rgba(148,163,184,.08); font-weight: 950; }
+    .daily-event { display: grid; grid-template-columns: 98px 1fr 130px 110px 145px auto; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid rgba(154,168,187,.12); }
+    .amount-plus { color: #86efac; font-weight: 950; }
+    .amount-minus { color: #fecaca; font-weight: 950; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 950; border-radius: 999px; padding: 4px 7px; color: #111827; background: var(--yellow); margin-left: 6px; }
+    .badge.review { color: #2e1065; background: #ddd6fe; }
+    .balance-chip { font-weight: 850; padding: 6px 9px; border-radius: 999px; background: rgba(148,163,184,.12); display: inline-block; margin: 2px; }
+    .balance-chip.low { background: rgba(250,204,21,.13); color: #fde68a; }
+    .balance-chip.neg { background: rgba(239,68,68,.13); color: #fecaca; }
     .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .metric { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid rgba(154,168,187,.14); }
     .metric span:first-child { color: var(--muted); }
     .metric strong { text-align: right; }
-    .strategic { padding: 15px; border-radius: 18px; border: 1px solid rgba(56,189,248,.24); background: rgba(56,189,248,.08); line-height: 1.55; }
-    .warning { padding: 14px; border-radius: 18px; border: 1px solid rgba(250,204,21,.28); background: rgba(250,204,21,.1); color: #fde68a; }
-    .danger-note { padding: 14px; border-radius: 18px; border: 1px solid rgba(239,68,68,.28); background: rgba(239,68,68,.1); color: #fecaca; }
-    .success-note { padding: 14px; border-radius: 18px; border: 1px solid rgba(34,197,94,.28); background: rgba(34,197,94,.1); color: #bbf7d0; }
-    .daily-group { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: rgba(11,18,32,.62); }
-    .daily-head { display: flex; justify-content: space-between; gap: 16px; padding: 14px 16px; background: rgba(148,163,184,.08); font-weight: 950; }
-    .daily-event { display: grid; grid-template-columns: 110px 1fr 120px 120px 150px auto; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid rgba(154,168,187,.12); }
-    .amount-plus { color: #86efac; font-weight: 950; }
-    .amount-minus { color: #fecaca; font-weight: 950; }
-    .balance-chip { font-weight: 900; padding: 6px 9px; border-radius: 999px; background: rgba(148,163,184,.12); display: inline-block; margin: 2px; }
-    .balance-chip.low { background: rgba(250,204,21,.13); color: #fde68a; }
-    .balance-chip.neg { background: rgba(239,68,68,.13); color: #fecaca; }
+    .warning, .danger-note, .success-note, .insight { padding: 14px; border-radius: 18px; line-height: 1.5; }
+    .warning { border: 1px solid rgba(250,204,21,.28); background: rgba(250,204,21,.1); color: #fde68a; }
+    .danger-note { border: 1px solid rgba(239,68,68,.28); background: rgba(239,68,68,.1); color: #fecaca; }
+    .success-note { border: 1px solid rgba(34,197,94,.28); background: rgba(34,197,94,.1); color: #bbf7d0; }
+    .insight { border: 1px solid rgba(56,189,248,.24); background: rgba(56,189,248,.08); }
     .progress-shell { height: 18px; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: rgba(148,163,184,.12); }
     .progress-bar { height: 100%; background: linear-gradient(90deg,var(--accent),var(--green)); width: 0%; }
     canvas { width: 100%; max-width: 100%; border: 1px solid var(--line); border-radius: 18px; background: rgba(11,18,32,.75); }
-
-    @media (max-width: 1000px) {
+    @media (max-width: 1100px) {
       .shell { grid-template-columns: 1fr; }
       .sidebar { height: auto; position: static; }
       .workspace { grid-template-columns: 1fr; }
       .subnav { display: grid; grid-template-columns: repeat(3,1fr); }
       .cards, .scenario-grid { grid-template-columns: repeat(2,1fr); }
-      .debt-card, .daily-event { grid-template-columns: 1fr 1fr; }
+      .row-card, .daily-event { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 680px) {
+    @media (max-width: 700px) {
       .shell { width: calc(100% - 18px); margin: 9px auto; }
       .topbar { flex-direction: column; align-items: flex-start; }
       .content { padding: 14px; }
@@ -141,13 +130,13 @@
     <aside class="sidebar">
       <div class="brand">
         <h1>Daily OS</h1>
-        <p>Private command center for daily planning and personal systems.</p>
+        <p>Private command center for planning, priorities, and personal systems.</p>
       </div>
       <nav class="nav">
         <button class="active" data-os="home">Home</button>
         <button data-os="workspace">Workspace</button>
-        <button data-os="inbox">Inbox</button>
-        <button data-os="calendar">Calendar</button>
+        <button data-os="calendar">Calendar Intel</button>
+        <button data-os="lifestyle">Meal / Lifestyle</button>
       </nav>
       <div class="sidebar-note">Private workspace data stays in this browser using <strong>localStorage</strong>. Default access PIN is <strong>1234</strong>.</div>
     </aside>
@@ -163,91 +152,86 @@
       <section class="content">
         <div id="homeArea"></div>
         <div id="workspaceArea" class="hidden"></div>
-        <div id="inboxArea" class="hidden panel"><h3>Inbox</h3><p class="hint">Placeholder section. This stays separate from the private workspace.</p></div>
-        <div id="calendarArea" class="hidden panel"><h3>Calendar</h3><p class="hint">Placeholder section. This stays separate from the private workspace.</p></div>
+        <div id="calendarArea" class="hidden panel"><h3>Calendar Intelligence</h3><p class="hint">Future module: connect schedule density, sports weeks, travel, and late work meetings to spending and meal-planning risk.</p><div class="insight">Future insight example: Weeks with 4+ sports events may increase convenience spending unless meal prep is planned.</div></div>
+        <div id="lifestyleArea" class="hidden panel"><h3>Meal / Lifestyle</h3><p class="hint">Future module: meal prep, dining frequency, convenience spending, and lifestyle drift patterns.</p><div class="insight">Future insight example: Dining spikes may be predicted by calendar overload, low grocery readiness, and higher-than-baseline paycheck weeks.</div></div>
       </section>
     </main>
   </div>
 
 <script>
-const STORAGE_KEY = "dailyOS.privateWorkspace.v2";
-const PIN_KEY = "dailyOS.pin.v1";
+const STORAGE_KEY = "dailyOS.v2.privateData";
+const PIN_KEY = "dailyOS.v2.pin";
 
 function nextYearDate(){ const d = new Date(); d.setFullYear(d.getFullYear()+1); return d.toISOString().slice(0,10); }
+const categoryList = ["Income","Housing","Utilities","Groceries","Dining","Transportation","Kids / Sports","Travel","Debt Payments","Insurance","Subscriptions","Personal Care","Shopping","Savings","Home Improvement","Medical","Misc"];
+const categoryRules = {
+  "costco":"Groceries","kroger":"Groceries","walmart":"Groceries","target":"Shopping","chick-fil-a":"Dining","mcdonald":"Dining","chipotle":"Dining","starbucks":"Dining","restaurant":"Dining","pizza":"Dining","doordash":"Dining","uber eats":"Dining","shell":"Transportation","exxon":"Transportation","chevron":"Transportation","ntta":"Transportation","soccer":"Kids / Sports","tournament":"Kids / Sports","academy":"Kids / Sports","netflix":"Subscriptions","spotify":"Subscriptions","apple":"Subscriptions","marriott":"Travel","hilton":"Travel","southwest":"Travel","delta":"Travel","amazon":"Shopping","home depot":"Home Improvement","lowes":"Home Improvement","faucet":"Home Improvement","mortgage":"Housing","electric":"Utilities","water":"Utilities","gas bill":"Utilities","insurance":"Insurance","doctor":"Medical","pharmacy":"Medical"
+};
 const defaults = {
-  overview: {
-    checking1Name: "Sofi", checking1: 0,
-    checking2Name: "USAA", checking2: 0,
-    checking3Name: "Emergency Cash", checking3: 0,
-    estimatedBonus: 55000, bonusTaxRate: 35,
-    k401: 0, homeEquity: 0, profitShare: 0
-  },
+  accounts: [
+    { id:"checking1", name:"Sofi", balance:0, type:"checking" },
+    { id:"checking2", name:"USAA", balance:0, type:"checking" },
+    { id:"checking3", name:"Emergency Cash", balance:0, type:"cash_buffer" }
+  ],
+  settings: { requiredBuffer: 1000, diningReflectionPct: 60 },
+  paychecks: [],
+  recurringBills: [],
+  cashflowEvents: [],
+  wantsNeeds: [],
+  tradeoffReviews: [],
   debts: [],
-  cashflow: [],
-  scenario: { bonusDebtPct: 70, bonusCarPct: 20, bonusCashPct: 10, monthlyExtraFromCarSavings: 500 },
-  carFund: { targetAmount: 30000, currentSaved: 0, monthlyContribution: 500, targetDate: nextYearDate() }
+  bonus: { gross: 55000, taxRate: 35, debtPct:70, bufferPct:10, wantsPct:20 },
+  carFund: { targetAmount:30000, currentSaved:0, monthlyContribution:500, targetDate:nextYearDate() }
 };
 let data = loadData();
 let activeOS = "home";
-let activeTab = "overview";
+let activeTab = "command";
 let unlocked = false;
 let pinEntry = "";
 
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
-function merge(base, saved){
-  for (const k in saved || {}) {
-    if (saved[k] && typeof saved[k] === "object" && !Array.isArray(saved[k])) base[k] = merge(base[k] || {}, saved[k]);
-    else base[k] = saved[k];
-  }
-  return base;
-}
-function loadData(){ try { return merge(clone(defaults), JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch { return clone(defaults); } }
+function merge(base, saved){ for(const k in saved || {}){ if(saved[k] && typeof saved[k]==="object" && !Array.isArray(saved[k])) base[k]=merge(base[k]||{}, saved[k]); else base[k]=saved[k]; } return base; }
+function loadData(){ try { return merge(clone(defaults), JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")); } catch { return clone(defaults); } }
 function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function getPin(){ return localStorage.getItem(PIN_KEY) || "1234"; }
 function setPin(pin){ localStorage.setItem(PIN_KEY, pin); }
 function money(v){ return (Number(v)||0).toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}); }
 function money2(v){ return (Number(v)||0).toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}); }
-function pct(v){ return `${(Number(v)||0).toFixed(2)}%`; }
+function pct(v){ return `${(Number(v)||0).toFixed(1)}%`; }
 function esc(s){ return String(s ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
-
-function totalCash(){ const o=data.overview; return Number(o.checking1)+Number(o.checking2)+Number(o.checking3); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function addDays(date, days){ const d=new Date(date); d.setDate(d.getDate()+days); return d; }
+function accountName(id){ return data.accounts.find(a=>a.id===id)?.name || id; }
+function totalCash(){ return data.accounts.reduce((s,a)=>s+Number(a.balance||0),0); }
 function totalDebt(){ return data.debts.reduce((s,d)=>s+Number(d.balance||0),0); }
-function totalMins(){ return data.debts.reduce((s,d)=>s+Number(d.minPayment||0),0); }
-function netBonus(){ return Number(data.overview.estimatedBonus||0)*(1-Number(data.overview.bonusTaxRate||0)/100); }
-function lockedWealth(){ const o=data.overview; return Number(o.k401)+Number(o.homeEquity)+Number(o.profitShare); }
-function sortedDebts(){ return [...data.debts].sort((a,b)=>Number(b.rate||0)-Number(a.rate||0)); }
-function accounts(){
-  const o=data.overview;
-  return [
-    { id:"checking1", name:o.checking1Name || "Account 1", start:Number(o.checking1||0) },
-    { id:"checking2", name:o.checking2Name || "Account 2", start:Number(o.checking2||0) },
-    { id:"checking3", name:o.checking3Name || "Account 3", start:Number(o.checking3||0) }
-  ];
-}
+function totalDebtMins(){ return data.debts.reduce((s,d)=>s+Number(d.minPayment||0),0); }
+function netBonus(){ return Number(data.bonus.gross||0)*(1-Number(data.bonus.taxRate||0)/100); }
+function suggestCategory(text){ const lower=String(text||"").toLowerCase(); for(const key in categoryRules){ if(lower.includes(key)) return categoryRules[key]; } return "Misc"; }
+function categoryOptions(selected="Misc"){ return categoryList.map(c=>`<option value="${c}" ${selected===c?'selected':''}>${c}</option>`).join(""); }
 
 function render(){
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active", b.dataset.os===activeOS));
   document.getElementById("homeArea").classList.toggle("hidden", activeOS!=="home");
   document.getElementById("workspaceArea").classList.toggle("hidden", activeOS!=="workspace");
-  document.getElementById("inboxArea").classList.toggle("hidden", activeOS!=="inbox");
   document.getElementById("calendarArea").classList.toggle("hidden", activeOS!=="calendar");
-  document.getElementById("title").textContent = activeOS==="workspace" ? "Workspace" : activeOS==="home" ? "Daily Command Center" : activeOS[0].toUpperCase()+activeOS.slice(1);
-  document.getElementById("subtitle").textContent = activeOS==="workspace" ? "Secure personal workspace." : activeOS==="home" ? "Daily planning workspace." : "Placeholder workspace.";
+  document.getElementById("lifestyleArea").classList.toggle("hidden", activeOS!=="lifestyle");
+  document.getElementById("title").textContent = activeOS==="workspace" ? "Secure Workspace" : activeOS==="home" ? "Daily Command Center" : activeOS==="calendar" ? "Calendar Intelligence" : "Meal / Lifestyle";
+  document.getElementById("subtitle").textContent = activeOS==="workspace" ? "Personal governance system." : activeOS==="home" ? "Daily planning workspace." : "Future intelligence module.";
   document.getElementById("statusBtn").textContent = activeOS==="workspace" ? (unlocked ? "LOCK WORKSPACE" : "READY") : activeOS==="home" ? "OPEN WORKSPACE" : "OPEN";
-  if (activeOS==="home") renderHome();
-  if (activeOS==="workspace") renderWorkspace();
+  if(activeOS==="home") renderHome();
+  if(activeOS==="workspace") renderWorkspace();
 }
-function statusClick(){ if(activeOS==="home") { activeOS="workspace"; render(); } else if(activeOS==="workspace" && unlocked) { unlocked=false; render(); } }
+function statusClick(){ if(activeOS==="home"){ activeOS="workspace"; render(); } else if(activeOS==="workspace" && unlocked){ unlocked=false; render(); } }
 
 function renderHome(){
   document.getElementById("homeArea").innerHTML = `
     <div class="panel">
       <h3>Today’s Operating View</h3>
-      <p class="hint">A lightweight daily workspace for reminders, priorities, and planning. Sensitive workspaces are separated behind their own controls.</p>
+      <p class="hint">A lightweight command center. Sensitive tools are separated behind their own controls.</p>
       <div class="cards">
         <div class="card"><label>Top Priority</label><input placeholder="Enter today’s main focus"></div>
         <div class="card"><label>Open Loops</label><div class="value small">Manual</div><p class="hint">Placeholder planning view</p></div>
-        <div class="card"><label>Upcoming</label><div class="value small">Not connected</div><p class="hint">Calendar placeholder</p></div>
+        <div class="card"><label>Calendar</label><div class="value small">Not connected</div><p class="hint">Future context layer</p></div>
         <div class="card"><label>Workspace</label><button class="btn secondary" onclick="activeOS='workspace'; render();">Open Workspace</button></div>
       </div>
     </div>`;
@@ -259,184 +243,139 @@ function renderWorkspace(){
   area.innerHTML = `
     <div class="workspace">
       <nav class="subnav">
-        ${["overview","cashflow","debts","scenarios","carFund","settings"].map(t=>`<button class="${activeTab===t?'active':''}" onclick="activeTab='${t}'; render();">${tabLabel(t)}</button>`).join("")}
+        ${["command","finance","paycycle","cashflow","wants","tradeoff","debts","bonus","car","settings"].map(t=>`<button class="${activeTab===t?'active':''}" onclick="activeTab='${t}'; render();">${tabLabel(t)}</button>`).join("")}
       </nav>
       <div class="panel" id="tabPanel"></div>
     </div>`;
   const p=document.getElementById("tabPanel");
-  if(activeTab==="overview") p.innerHTML=overviewHTML();
+  if(activeTab==="command") p.innerHTML=commandHTML();
+  if(activeTab==="finance") p.innerHTML=financeHTML();
+  if(activeTab==="paycycle") p.innerHTML=paycycleHTML();
   if(activeTab==="cashflow") p.innerHTML=cashflowHTML();
+  if(activeTab==="wants") p.innerHTML=wantsHTML();
+  if(activeTab==="tradeoff") p.innerHTML=tradeoffHTML();
   if(activeTab==="debts") p.innerHTML=debtsHTML();
-  if(activeTab==="scenarios") p.innerHTML=scenariosHTML();
-  if(activeTab==="carFund") { p.innerHTML=carHTML(); setTimeout(drawCarChart,0); }
+  if(activeTab==="bonus") p.innerHTML=bonusHTML();
+  if(activeTab==="car") { p.innerHTML=carHTML(); setTimeout(drawCarChart,0); }
   if(activeTab==="settings") p.innerHTML=settingsHTML();
 }
-function tabLabel(t){ return ({overview:"Financial Center",cashflow:"Cash Flow",debts:"Debts",scenarios:"Scenarios",carFund:"Car Fund",settings:"Settings"})[t]; }
+function tabLabel(t){ return ({command:"Command Center",finance:"Financial Center",paycycle:"Pay Cycle",cashflow:"Cash Flow",wants:"Wants / Needs",tradeoff:"Trade-Off Coach",debts:"Debts",bonus:"Bonus Strategy",car:"Car Fund",settings:"Settings"})[t]; }
 
-function lockHTML(){ return `
-  <div class="lock-screen"><div class="pin-card" id="pinCard">
-    <h3>Workspace Locked</h3><p>Enter your 4-digit PIN to continue.</p>
-    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <div class="pinpad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="pressPin('${n}')">${n}</button>`).join("")}<button onclick="clearPin()">Clear</button><button onclick="pressPin('0')">0</button><button onclick="backPin()">⌫</button></div>
-  </div></div>`; }
+function lockHTML(){ return `<div class="lock-screen"><div class="pin-card" id="pinCard"><h3>Workspace Locked</h3><p>Enter your 4-digit PIN to continue.</p><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="pinpad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="pressPin('${n}')">${n}</button>`).join("")}<button onclick="clearPin()">Clear</button><button onclick="pressPin('0')">0</button><button onclick="backPin()">⌫</button></div></div></div>`; }
 function updateDots(){ document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("filled", i<pinEntry.length)); }
-function pressPin(n){ pinEntry+=n; updateDots(); if(pinEntry.length===4){ if(pinEntry===getPin()){ unlocked=true; pinEntry=""; activeTab="overview"; render(); } else { const c=document.getElementById("pinCard"); c.classList.add("shake"); setTimeout(()=>{pinEntry=""; c.classList.remove("shake"); updateDots();},380); } } }
+function pressPin(n){ if(pinEntry.length>=4) return; pinEntry+=n; updateDots(); if(pinEntry.length===4){ if(pinEntry===getPin()){ unlocked=true; pinEntry=""; activeTab="command"; render(); } else { const c=document.getElementById("pinCard"); c.classList.add("shake"); setTimeout(()=>{pinEntry=""; c.classList.remove("shake"); updateDots();},380); } } }
 function clearPin(){ pinEntry=""; updateDots(); }
 function backPin(){ pinEntry=pinEntry.slice(0,-1); updateDots(); }
 
-function overviewHTML(){ const o=data.overview; const cf=projectCashflow(); return `
-  <h3>Financial Command Center</h3><p class="hint">This is the landing page after the PIN. Use Cash Flow for future line-item planning, and the other tabs for debt, bonus, and savings strategy.</p>
-  <div class="cards">
-    <div class="card"><label>Total Liquid Cash</label><div class="value">${money(totalCash())}</div><p class="hint">Current starting balances</p></div>
-    <div class="card"><label>Projected Cash End</label><div class="value">${money(cf.endingTotal)}</div><p class="hint">After cash flow events</p></div>
-    <div class="card"><label>Total Debt</label><div class="value">${money(totalDebt())}</div><p class="hint">Across debt cards</p></div>
-    <div class="card"><label>Estimated Net Bonus</label><div class="value">${money(netBonus())}</div><p class="hint">After estimated tax</p></div>
-  </div>
-  <div class="divider"></div>
-  <div class="cards">
-    ${accounts().map(a=>`<div class="card"><label>${esc(a.name)} Starting Balance</label><input type="number" value="${a.start}" onchange="updatePath('overview.${a.id}', this.value)"></div>`).join("")}
-    <div class="card"><label>Locked / Contingent Wealth</label><div class="value">${money(lockedWealth())}</div></div>
-  </div>
-  <div class="divider"></div>
-  <h3>Account Names + Bonus</h3>
-  <div class="form-grid">
-    <div class="field"><label>Account 1 Name</label><input value="${esc(o.checking1Name)}" onchange="updatePath('overview.checking1Name', this.value)"></div>
-    <div class="field"><label>Account 2 Name</label><input value="${esc(o.checking2Name)}" onchange="updatePath('overview.checking2Name', this.value)"></div>
-    <div class="field"><label>Account 3 Name</label><input value="${esc(o.checking3Name)}" onchange="updatePath('overview.checking3Name', this.value)"></div>
-    <div class="field"><label>Gross Bonus</label><input type="number" value="${o.estimatedBonus}" onchange="updatePath('overview.estimatedBonus', this.value)"></div>
-    <div class="field"><label>Bonus Tax Rate %</label><input type="number" value="${o.bonusTaxRate}" onchange="updatePath('overview.bonusTaxRate', this.value)"></div>
-    <div class="field"><label>401k Estimate</label><input type="number" value="${o.k401}" onchange="updatePath('overview.k401', this.value)"></div>
-    <div class="field"><label>Home Equity</label><input type="number" value="${o.homeEquity}" onchange="updatePath('overview.homeEquity', this.value)"></div>
-    <div class="field"><label>Profit Share</label><input type="number" value="${o.profitShare}" onchange="updatePath('overview.profitShare', this.value)"></div>
-  </div>
-  <div class="divider"></div>
-  <button class="btn success" onclick="activeTab='cashflow'; render();">Open Cash Flow Ledger</button>`; }
-
-function cashflowHTML(){ const proj=projectCashflow(); const acct=accounts(); return `
-  <h3>Cash Flow Ledger</h3>
-  <p class="hint">Enter future line-item charges, paychecks, bills, and transfers. The timeline shows each event and the running balance after that line.</p>
-  <div class="cards">
-    <div class="card"><label>Starting Cash</label><div class="value">${money(totalCash())}</div></div>
-    <div class="card"><label>Projected Ending Cash</label><div class="value">${money(proj.endingTotal)}</div></div>
-    <div class="card"><label>Lowest Projected Balance</label><div class="value">${money(proj.lowestTotal)}</div><p class="hint">Across all accounts combined</p></div>
-    <div class="card"><label>Events</label><div class="value">${data.cashflow.length}</div></div>
-  </div>
-  <div class="divider"></div>
-  <h3>Add Line Item</h3>
-  <div class="form-grid">
-    <div class="field"><label>Date</label><input id="cfDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-    <div class="field wide"><label>Description</label><input id="cfDesc" placeholder="Mortgage, Groceries, Paycheck, Transfer"></div>
-    <div class="field"><label>Amount</label><input id="cfAmount" type="number" step="0.01" placeholder="225.00"></div>
-    <div class="field"><label>Account</label><select id="cfAccount">${acct.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></div>
-    <div class="field"><label>Type</label><select id="cfType" onchange="toggleTransferFields()"><option value="income">Income</option><option value="expense">Expense / Bill</option><option value="transfer">Transfer</option></select></div>
-    <div class="field" id="toAccountWrap" style="display:none"><label>To Account</label><select id="cfToAccount">${acct.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></div>
-    <button class="btn success" onclick="addCashflowEvent()">Add Event</button>
-  </div>
-  <div class="divider"></div>
-  ${cashflowInsights(proj)}
-  <div class="divider"></div>
-  <h3>Timeline</h3>
-  <div class="daily-groups">${timelineHTML(proj)}</div>`; }
-function toggleTransferFields(){ const el=document.getElementById("toAccountWrap"); if(el) el.style.display = document.getElementById("cfType").value==="transfer" ? "block" : "none"; }
-function addCashflowEvent(){
-  const date=document.getElementById("cfDate").value;
-  const desc=document.getElementById("cfDesc").value.trim();
-  const amount=Number(document.getElementById("cfAmount").value||0);
-  const account=document.getElementById("cfAccount").value;
-  const type=document.getElementById("cfType").value;
-  const toAccount=document.getElementById("cfToAccount")?.value;
-  if(!date || !desc || amount<=0) return alert("Add a date, description, and positive amount.");
-  if(type==="transfer" && account===toAccount) return alert("Transfer needs two different accounts.");
-  data.cashflow.push({id:crypto.randomUUID(), date, desc, amount, account, type, toAccount: type==="transfer" ? toAccount : null});
-  saveData(); render();
-}
-function deleteCashflow(id){ data.cashflow=data.cashflow.filter(e=>e.id!==id); saveData(); render(); }
-function projectCashflow(){
-  const acct=accounts();
-  const balances={}; acct.forEach(a=>balances[a.id]=a.start);
-  let lowestTotal=acct.reduce((s,a)=>s+a.start,0);
-  const events=[...data.cashflow].sort((a,b)=> new Date(a.date)-new Date(b.date) || a.desc.localeCompare(b.desc));
-  const projected=[];
-  for(const e of events){
-    if(e.type==="income") balances[e.account]+=Number(e.amount||0);
-    if(e.type==="expense") balances[e.account]-=Number(e.amount||0);
-    if(e.type==="transfer") { balances[e.account]-=Number(e.amount||0); balances[e.toAccount]+=Number(e.amount||0); }
-    const snapshot=clone(balances);
-    const total=Object.values(snapshot).reduce((s,v)=>s+Number(v||0),0);
-    lowestTotal=Math.min(lowestTotal,total);
+function projection(){
+  const balances={}; data.accounts.forEach(a=>balances[a.id]=Number(a.balance||0));
+  const events=[...data.cashflowEvents].sort((a,b)=>new Date(a.date)-new Date(b.date) || a.description.localeCompare(b.description));
+  let lowestTotal=Object.values(balances).reduce((s,v)=>s+v,0); const projected=[];
+  events.forEach(e=>{
+    const amt=Number(e.amount||0);
+    if(e.type==="income") balances[e.accountId]+=amt;
+    if(e.type==="expense") balances[e.accountId]-=amt;
+    if(e.type==="transfer"){ balances[e.accountId]-=amt; balances[e.toAccountId]+=amt; }
+    const snapshot=clone(balances); const total=Object.values(snapshot).reduce((s,v)=>s+v,0); lowestTotal=Math.min(lowestTotal,total);
     projected.push({...e, balances:snapshot, total});
-  }
-  return { events: projected, endingBalances: balances, endingTotal:Object.values(balances).reduce((s,v)=>s+Number(v||0),0), lowestTotal };
+  });
+  return { events:projected, endingBalances:balances, endingTotal:Object.values(balances).reduce((s,v)=>s+v,0), lowestTotal };
 }
-function cashflowInsights(proj){
-  const lows=[]; const acct=accounts();
-  proj.events.forEach(e=>acct.forEach(a=>{ if(e.balances[a.id]<0) lows.push(`${a.name} goes negative after ${e.desc} on ${e.date}`); }));
-  if(lows.length) return `<div class="danger-note"><strong>Cash flow warning:</strong> ${esc(lows[0])}.</div>`;
-  if(data.cashflow.length===0) return `<div class="warning">No future line items yet. Add upcoming paychecks, bills, charges, and transfers to begin forecasting.</div>`;
-  return `<div class="success-note">No negative account balances detected in the current timeline.</div>`;
-}
-function timelineHTML(proj){
-  if(!proj.events.length) return `<div class="warning">No cash flow events yet.</div>`;
-  const acct=accounts();
-  const groups={}; proj.events.forEach(e=>{ (groups[e.date] ||= []).push(e); });
-  return Object.keys(groups).map(date=>`
-    <div class="daily-group">
-      <div class="daily-head"><span>${date}</span><span>${groups[date].length} line item${groups[date].length>1?'s':''}</span></div>
-      ${groups[date].map(e=>`
-        <div class="daily-event">
-          <div><strong>${esc(e.type)}</strong></div>
-          <div>${esc(e.desc)}${e.type==="transfer" ? ` <span class="muted">(${accountName(e.account)} → ${accountName(e.toAccount)})</span>` : ` <span class="muted">(${accountName(e.account)})</span>`}</div>
-          <div class="${e.type==='income'?'amount-plus':'amount-minus'}">${e.type==='income'?'+':'-'}${money2(e.amount)}</div>
-          <div><span class="muted">Total</span><br><strong>${money2(e.total)}</strong></div>
-          <div>${acct.map(a=>`<span class="balance-chip ${e.balances[a.id]<0?'neg':e.balances[a.id]<500?'low':''}">${esc(a.name)} ${money2(e.balances[a.id])}</span>`).join(" ")}</div>
-          <button class="btn danger small" onclick="deleteCashflow('${e.id}')">Delete</button>
-        </div>`).join("")}
-    </div>`).join("");
-}
-function accountName(id){ return accounts().find(a=>a.id===id)?.name || id; }
+function upcomingExpenseTotal(days=30, fixedOnly=false){ const end=addDays(new Date(),days); return data.cashflowEvents.filter(e=>e.type==="expense" && new Date(e.date)<=end && (!fixedOnly || ["Housing","Utilities","Insurance","Debt Payments","Subscriptions","Kids / Sports"].includes(e.category))).reduce((s,e)=>s+Number(e.amount||0),0); }
+function wantsDueSoon(days=45){ const end=addDays(new Date(),days); return data.wantsNeeds.filter(w=>w.status!=="funded" && w.status!=="purchased" && w.targetDate && new Date(w.targetDate)<=end).reduce((s,w)=>s+Number(w.amount||0),0); }
+function safeToSpend(){ return totalCash() - upcomingExpenseTotal(30,true) - totalDebtMins() - Number(data.settings.requiredBuffer||0) - wantsDueSoon(45); }
+function diningStats(){ const events=data.cashflowEvents.filter(e=>e.category==="Dining" && e.type==="expense"); const total=events.reduce((s,e)=>s+Number(e.amount||0),0); const avoid=total*(1-Number(data.settings.diningReflectionPct||60)/100); return {count:events.length,total,avg:events.length?total/events.length:0,avoidable:avoid}; }
+function missedOpportunityTotal(){ return data.tradeoffReviews.reduce((s,r)=>s+Number(r.avoidableSpend||0),0); }
+function topTradeoffTarget(amount){ const wants=[...data.wantsNeeds].filter(w=>w.status!=="purchased").sort((a,b)=>Number(a.amount)-Number(b.amount)); if(wants[0]) return `${Math.round(amount/Number(wants[0].amount||1)*100)}% of ${wants[0].name}`; if(data.debts[0]) return `an extra payment toward ${data.debts[0].name}`; return "your buffer or next planned goal"; }
 
-function debtsHTML(){ const debts=sortedDebts(); return `
-  <h3>Debts</h3><p class="hint">Add balances, rates, and minimum payments. Highest rate sorts first.</p>
-  <div class="form-grid"><div class="field"><label>Name</label><input id="debtName"></div><div class="field"><label>Balance</label><input id="debtBalance" type="number"></div><div class="field"><label>Rate %</label><input id="debtRate" type="number" step="0.01"></div><div class="field"><label>Minimum</label><input id="debtMin" type="number"></div><div class="field wide"><label>Notes</label><input id="debtNotes"></div><button class="btn success" onclick="addDebt()">Add Debt</button></div>
-  <div class="divider"></div><div class="debt-list">${debts.length?debts.map((d,i)=>`<div class="debt-card"><div><strong>${esc(d.name)}</strong>${i===0?'<span class="badge">HIGHEST RATE</span>':''}<p class="hint">${esc(d.notes||'No notes')}</p></div><div><span class="muted">Balance</span><br><strong>${money2(d.balance)}</strong></div><div><span class="muted">Rate</span><br><strong>${pct(d.rate)}</strong></div><div><span class="muted">Min</span><br><strong>${money2(d.minPayment)}</strong></div><div><span class="muted">Monthly Interest</span><br><strong>${money2(monthlyInterest(d))}</strong></div><button class="btn danger small" onclick="deleteDebt('${d.id}')">Delete</button></div>`).join(""):'<div class="warning">No debts added yet.</div>'}</div>`; }
-function monthlyInterest(d){ return Number(d.balance||0)*(Number(d.rate||0)/100)/12; }
-function addDebt(){ const name=document.getElementById("debtName").value.trim(); const balance=Number(document.getElementById("debtBalance").value||0); const rate=Number(document.getElementById("debtRate").value||0); const minPayment=Number(document.getElementById("debtMin").value||0); const notes=document.getElementById("debtNotes").value.trim(); if(!name||balance<=0)return alert("Add name and balance."); data.debts.push({id:crypto.randomUUID(),name,balance,rate,minPayment,notes}); saveData(); render(); }
-function deleteDebt(id){ data.debts=data.debts.filter(d=>d.id!==id); saveData(); render(); }
+function commandHTML(){ const proj=projection(); const safe=safeToSpend(); const dining=diningStats(); return `
+  <h3>Command Center</h3><p class="hint">Top-level governance view: cash timing, safe-to-spend, lifestyle drift, and trade-off visibility.</p>
+  <div class="cards">
+    <div class="card"><label>Total Cash</label><div class="value">${money(totalCash())}</div></div>
+    <div class="card"><label>Projected End Cash</label><div class="value">${money(proj.endingTotal)}</div></div>
+    <div class="card"><label>Safe to Spend</label><div class="value">${money(safe)}</div><p class="hint">After 30-day fixed expenses, debt minimums, buffer, and near-term wants.</p></div>
+    <div class="card"><label>Dining This Plan</label><div class="value">${money(dining.total)}</div><p class="hint">${dining.count} transactions</p></div>
+  </div>
+  <div class="divider"></div>
+  ${safe<0?`<div class="danger-note"><strong>Governance alert:</strong> Safe-to-spend is negative. Planned obligations exceed available flexible cash by ${money(Math.abs(safe))}.</div>`:`<div class="success-note"><strong>Governance status:</strong> Current plan leaves ${money(safe)} of estimated flexible cash after protected commitments.</div>`}
+  <div class="divider"></div>
+  <div class="insight"><strong>Trade-off insight:</strong> Dining reflection settings estimate ${money(dining.avoidable)} of avoidable lifestyle spend. That could contribute toward ${esc(topTradeoffTarget(dining.avoidable))}.</div>
+  <div class="divider"></div>
+  <div class="scenario-grid">
+    <div class="card"><h3>Plan Cash Flow</h3><p class="hint">Generate paycheck and bill rhythm, then inspect the ledger.</p><button class="btn success" onclick="activeTab='paycycle'; render();">Open Pay Cycle</button></div>
+    <div class="card"><h3>Review Trade-Offs</h3><p class="hint">Evaluate dinners, event tickets, impulse buys, and other discretionary expenses.</p><button class="btn purple" onclick="activeTab='tradeoff'; render();">Open Coach</button></div>
+    <div class="card"><h3>Capture Wants / Needs</h3><p class="hint">Put faucets, bikes, vacations, or pool ideas into the system before they become random charges.</p><button class="btn secondary" onclick="activeTab='wants'; render();">Open Planner</button></div>
+  </div>`; }
 
-function simulate(lump, extra){
-  let debts=sortedDebts().map(d=>({...d,balance:Number(d.balance||0),rate:Number(d.rate||0),minPayment:Number(d.minPayment||0)}));
-  let l=Number(lump||0); for(const d of debts){ const p=Math.min(d.balance,l); d.balance-=p; l-=p; if(l<=0)break; }
-  debts=debts.filter(d=>d.balance>.01); const start=debts.reduce((s,d)=>s+d.balance,0); const monthly=totalMins()+Number(extra||0);
-  if(!debts.length) return {months:0, text:"Immediate", interest:0, start, monthly};
-  if(monthly<=0) return {months:Infinity, text:"No payoff path", interest:0, start, monthly};
-  let months=0, interest=0;
-  while(debts.reduce((s,d)=>s+d.balance,0)>.01 && months<1200){ months++; for(const d of debts){ const i=d.balance*(d.rate/100)/12; d.balance+=i; interest+=i; } let avail=monthly; for(const d of debts){ const p=Math.min(d.balance,d.minPayment); d.balance-=p; avail-=p; } debts.sort((a,b)=>b.rate-a.rate); for(const d of debts){ if(avail<=0)break; const p=Math.min(d.balance,avail); d.balance-=p; avail-=p; } debts=debts.filter(d=>d.balance>.01); }
-  return {months, text:months>=1200?"100+ years":`${months} mo`, interest, start, monthly};
-}
-function scenariosHTML(){ const s=data.scenario; const bonusDebt=netBonus()*s.bonusDebtPct/100; const min=simulate(0,0), bonus=simulate(bonusDebt,0), redirect=simulate(bonusDebt,s.monthlyExtraFromCarSavings); return `
-  <h3>Scenarios</h3><p class="hint">Debt avalanche comparison using highest-rate-first logic.</p>
-  <div class="cards"><div class="card"><label>Net Bonus</label><div class="value">${money(netBonus())}</div></div><div class="card"><label>Debt Allocation</label><div class="value">${money(bonusDebt)}</div></div><div class="card"><label>Monthly Redirect</label><input type="number" value="${s.monthlyExtraFromCarSavings}" onchange="updatePath('scenario.monthlyExtraFromCarSavings', this.value)"></div><div class="card"><label>Debt Allocation %</label><input type="number" value="${s.bonusDebtPct}" onchange="updatePath('scenario.bonusDebtPct', this.value)"></div></div>
-  <div class="divider"></div><div class="scenario-grid">${scenarioCard('Minimums Only',min)}${scenarioCard('Bonus to Debt',bonus)}${scenarioCard('Bonus + Redirect',redirect)}</div>
-  <div class="divider"></div><div class="strategic"><strong>Strategic read:</strong> Applying bonus dollars to the highest-rate debt first reduces interest drag. Redirecting monthly cash creates the strongest timeline compression.</div>`; }
-function scenarioCard(title,r){ return `<div class="card"><h3>${title}</h3><div class="metric"><span>Months</span><strong>${r.text}</strong></div><div class="metric"><span>Interest</span><strong>${money2(r.interest)}</strong></div><div class="metric"><span>Starting Debt</span><strong>${money2(r.start)}</strong></div><div class="metric"><span>Monthly Power</span><strong>${money2(r.monthly)}</strong></div></div>`; }
+function financeHTML(){ const proj=projection(); return `
+  <h3>Financial Center</h3><p class="hint">Edit core accounts, buffer requirements, bonus assumptions, and high-level wealth context.</p>
+  <div class="cards">
+    <div class="card"><label>Total Liquid Cash</label><div class="value">${money(totalCash())}</div></div>
+    <div class="card"><label>Projected Ending Cash</label><div class="value">${money(proj.endingTotal)}</div></div>
+    <div class="card"><label>Lowest Projected Cash</label><div class="value">${money(proj.lowestTotal)}</div></div>
+    <div class="card"><label>Total Debt</label><div class="value">${money(totalDebt())}</div></div>
+  </div>
+  <div class="divider"></div>
+  <h3>Accounts</h3><div class="form-grid">${data.accounts.map((a,i)=>`<div class="card"><label>Account ${i+1} Name</label><input value="${esc(a.name)}" onchange="updateAccount('${a.id}','name',this.value)"><br><br><label>Starting Balance</label><input type="number" value="${a.balance}" onchange="updateAccount('${a.id}','balance',this.value)"></div>`).join("")}</div>
+  <div class="divider"></div>
+  <div class="form-grid"><div class="field"><label>Required Buffer</label><input type="number" value="${data.settings.requiredBuffer}" onchange="updatePath('settings.requiredBuffer', this.value)"></div><div class="field"><label>Gross Bonus</label><input type="number" value="${data.bonus.gross}" onchange="updatePath('bonus.gross', this.value)"></div><div class="field"><label>Bonus Tax Rate %</label><input type="number" value="${data.bonus.taxRate}" onchange="updatePath('bonus.taxRate', this.value)"></div><div class="field"><label>Dining Reflection %</label><input type="number" value="${data.settings.diningReflectionPct}" onchange="updatePath('settings.diningReflectionPct', this.value)"></div></div>`; }
+function updateAccount(id,key,value){ const a=data.accounts.find(x=>x.id===id); if(!a)return; a[key]=key==="balance"?Number(value||0):value; saveData(); render(); }
 
-function carHTML(){ const c=data.carFund; const m=monthsUntil(c.targetDate); const projected=Number(c.currentSaved)+Number(c.monthlyContribution)*m; const needed=m>0?Math.max(0,(Number(c.targetAmount)-Number(c.currentSaved))/m):0; const gap=Number(c.targetAmount)-projected; const progress=Number(c.targetAmount)>0?Math.min(100,Number(c.currentSaved)/Number(c.targetAmount)*100):0; return `
-  <h3>Car Fund</h3><p class="hint">Track vehicle savings goal and projected shortfall.</p>
-  <div class="form-grid"><div class="field"><label>Target</label><input type="number" value="${c.targetAmount}" onchange="updatePath('carFund.targetAmount', this.value)"></div><div class="field"><label>Saved</label><input type="number" value="${c.currentSaved}" onchange="updatePath('carFund.currentSaved', this.value)"></div><div class="field"><label>Monthly</label><input type="number" value="${c.monthlyContribution}" onchange="updatePath('carFund.monthlyContribution', this.value)"></div><div class="field"><label>Target Date</label><input type="date" value="${c.targetDate}" onchange="updatePath('carFund.targetDate', this.value)"></div></div>
-  <div class="divider"></div><div class="cards"><div class="card"><label>Months</label><div class="value">${m}</div></div><div class="card"><label>Projected</label><div class="value">${money(projected)}</div></div><div class="card"><label>Needed Monthly</label><div class="value">${money(needed)}</div></div><div class="card"><label>Gap</label><div class="value">${money(Math.max(0,gap))}</div></div></div>
-  <div class="divider"></div><div class="progress-shell"><div class="progress-bar" style="width:${progress}%"></div></div><div class="divider"></div>${gap>0?`<div class="warning">Projected shortfall: ${money(gap)}.</div>`:`<div class="success-note">Projected to meet or exceed goal.</div>`}<div class="divider"></div><canvas id="carChart" width="900" height="320"></canvas>`; }
+function paycycleHTML(){ return `
+  <h3>Pay Cycle Planner</h3><p class="hint">Model money by paycheck rhythm. This helps prevent timing compression and credit card creep.</p>
+  <div class="cards"><div class="card"><label>Paychecks</label><div class="value">${data.paychecks.length}</div></div><div class="card"><label>Recurring Bills</label><div class="value">${data.recurringBills.length}</div></div><div class="card"><label>Monthly Fixed Load</label><div class="value">${money(monthlyRecurringTotal())}</div></div><div class="card"><label>Plan Window</label><div class="value small">60 days</div></div></div>
+  <div class="divider"></div><h3>Add Paycheck Template</h3><div class="form-grid"><div class="field"><label>Name</label><input id="pcName" placeholder="Jesse paycheck"></div><div class="field"><label>Amount</label><input id="pcAmount" type="number"></div><div class="field"><label>Account</label><select id="pcAccount">${accountOptions()}</select></div><div class="field"><label>Day of Month</label><input id="pcDay" type="number" min="1" max="28"></div><button class="btn success" onclick="addPaycheck()">Add Paycheck</button></div>
+  <div class="divider"></div><h3>Add Recurring Bill / Commitment</h3><div class="form-grid"><div class="field"><label>Name</label><input id="rbName" placeholder="Mortgage, Soccer"></div><div class="field"><label>Amount</label><input id="rbAmount" type="number"></div><div class="field"><label>Account</label><select id="rbAccount">${accountOptions()}</select></div><div class="field"><label>Category</label><select id="rbCategory">${categoryOptions('Housing')}</select></div><div class="field"><label>Timing</label><select id="rbTiming"><option value="after_first_paycheck">After 1st paycheck</option><option value="after_second_paycheck">After 2nd paycheck</option><option value="monthly1">1st of month</option><option value="monthly15">15th of month</option><option value="weekly">Weekly</option></select></div><button class="btn success" onclick="addRecurringBill()">Add Commitment</button></div>
+  <div class="divider"></div><div class="scenario-grid"><div class="card"><h3>Paychecks</h3>${paycheckList()}</div><div class="card"><h3>Recurring</h3>${recurringList()}</div><div class="card"><h3>Generate Plan</h3><p class="hint">Adds next 60 days of generated paychecks and commitments to Cash Flow. Existing generated events are replaced; manual events stay.</p><button class="btn success" onclick="generatePlan()">Generate Next 60 Days</button></div></div>`; }
+function accountOptions(selected=""){ return data.accounts.map(a=>`<option value="${a.id}" ${selected===a.id?'selected':''}>${esc(a.name)}</option>`).join(""); }
+function monthlyRecurringTotal(){ return data.recurringBills.reduce((s,b)=>s+Number(b.amount||0)*(b.timing==="weekly"?4.33:1),0); }
+function addPaycheck(){ const name=v("pcName"), amount=num("pcAmount"), accountId=v("pcAccount"), day=Number(v("pcDay")); if(!name||amount<=0||day<1||day>28)return alert("Add paycheck name, amount, and day 1-28."); data.paychecks.push({id:crypto.randomUUID(), name, amount, accountId, dayOfMonth:day, baselineAmount:amount}); saveData(); render(); }
+function addRecurringBill(){ const name=v("rbName"), amount=num("rbAmount"), accountId=v("rbAccount"), category=v("rbCategory"), timingRule=v("rbTiming"); if(!name||amount<=0)return alert("Add name and amount."); data.recurringBills.push({id:crypto.randomUUID(), name, amount, accountId, category, timingRule}); saveData(); render(); }
+function paycheckList(){ if(!data.paychecks.length)return `<div class="warning">No paychecks yet. Add Jesse and Lily paycheck templates.</div>`; return data.paychecks.map(p=>`<div class="metric"><span>${esc(p.name)}<br><small class="muted">${accountName(p.accountId)} • day ${p.dayOfMonth}</small></span><strong>${money2(p.amount)} <button class="btn danger small" onclick="del('paychecks','${p.id}')">Delete</button></strong></div>`).join(""); }
+function recurringList(){ if(!data.recurringBills.length)return `<div class="warning">No recurring bills yet.</div>`; return data.recurringBills.map(b=>`<div class="metric"><span>${esc(b.name)}<br><small class="muted">${esc(b.category)} • ${esc(b.timingRule)} • ${accountName(b.accountId)}</small></span><strong>${money2(b.amount)} <button class="btn danger small" onclick="del('recurringBills','${b.id}')">Delete</button></strong></div>`).join(""); }
+function paycheckDay(order){ const days=[...new Set(data.paychecks.map(p=>Number(p.dayOfMonth)).filter(Boolean))].sort((a,b)=>a-b); return days[order-1] || (order===1?1:15); }
+function generatePlan(){ const start=new Date(); start.setHours(0,0,0,0); const end=addDays(start,60); const generated=[]; const add=(date, description, amount, accountId, type, category)=>{ if(date<start||date>end)return; generated.push({id:crypto.randomUUID(), date:date.toISOString().slice(0,10), description, amount, accountId, type, category, source:"generated", tradeoffReview:false}); };
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){ const day=d.getDate(); data.paychecks.forEach(p=>{ if(day===Number(p.dayOfMonth)) add(new Date(d), p.name, p.amount, p.accountId, "income", "Income"); }); data.recurringBills.forEach(b=>{ if(b.timingRule==="monthly1"&&day===1) add(new Date(d), b.name, b.amount, b.accountId,"expense",b.category); if(b.timingRule==="monthly15"&&day===15) add(new Date(d), b.name, b.amount, b.accountId,"expense",b.category); if(b.timingRule==="weekly"&&d.getDay()===5) add(new Date(d), b.name, b.amount, b.accountId,"expense",b.category); if(b.timingRule==="after_first_paycheck"&&day===paycheckDay(1)) add(new Date(d), b.name, b.amount, b.accountId,"expense",b.category); if(b.timingRule==="after_second_paycheck"&&day===paycheckDay(2)) add(new Date(d), b.name, b.amount, b.accountId,"expense",b.category); }); }
+  data.cashflowEvents=data.cashflowEvents.filter(e=>e.source!=="generated").concat(generated); saveData(); activeTab="cashflow"; render(); }
+
+function cashflowHTML(){ const proj=projection(); return `
+  <h3>Cash Flow Ledger</h3><p class="hint">Line-item future cash flow. Add paychecks, bills, charges, wants, transfers, and items for trade-off review.</p>
+  <div class="cards"><div class="card"><label>Starting Cash</label><div class="value">${money(totalCash())}</div></div><div class="card"><label>Projected End</label><div class="value">${money(proj.endingTotal)}</div></div><div class="card"><label>Lowest Point</label><div class="value">${money(proj.lowestTotal)}</div></div><div class="card"><label>Events</label><div class="value">${data.cashflowEvents.length}</div></div></div>
+  <div class="divider"></div><h3>Add Line Item</h3><div class="form-grid"><div class="field"><label>Date</label><input id="cfDate" type="date" value="${todayISO()}"></div><div class="field wide"><label>Description</label><input id="cfDesc" placeholder="Dinner, mortgage, tickets" oninput="suggestCashflowCategory()"></div><div class="field"><label>Amount</label><input id="cfAmount" type="number" step="0.01"></div><div class="field"><label>Account</label><select id="cfAccount">${accountOptions()}</select></div><div class="field"><label>Type</label><select id="cfType" onchange="toggleTransfer()"><option value="expense">Expense</option><option value="income">Income</option><option value="transfer">Transfer</option></select></div><div class="field"><label>Category</label><select id="cfCategory">${categoryOptions()}</select></div><div class="field" id="toWrap" style="display:none"><label>To Account</label><select id="cfToAccount">${accountOptions()}</select></div><div class="field"><label>Trade-Off Review?</label><select id="cfReview"><option value="false">No</option><option value="true">Yes</option></select></div><button class="btn success" onclick="addCashflow()">Add Event</button></div>
+  <div class="divider"></div>${cashflowInsight(proj)}<div class="divider"></div><h3>Timeline</h3><div class="list">${timeline(proj)}</div>`; }
+function suggestCashflowCategory(){ const desc=v("cfDesc"); const sel=document.getElementById("cfCategory"); if(sel) sel.value=suggestCategory(desc); }
+function toggleTransfer(){ const el=document.getElementById("toWrap"); if(el) el.style.display=v("cfType")==="transfer"?"block":"none"; }
+function addCashflow(){ const date=v("cfDate"), description=v("cfDesc"), amount=num("cfAmount"), accountId=v("cfAccount"), type=v("cfType"), category=v("cfCategory"), toAccountId=document.getElementById("cfToAccount")?.value, tradeoffReview=v("cfReview")==="true"; if(!date||!description||amount<=0)return alert("Add date, description, and positive amount."); if(type==="transfer"&&accountId===toAccountId)return alert("Transfer requires two different accounts."); data.cashflowEvents.push({id:crypto.randomUUID(), date, description, amount, accountId, type, category, toAccountId:type==="transfer"?toAccountId:null, tradeoffReview, source:"manual"}); saveData(); render(); }
+function cashflowInsight(proj){ const neg=[]; proj.events.forEach(e=>data.accounts.forEach(a=>{ if(e.balances[a.id]<0) neg.push(`${a.name} goes negative after ${e.description} on ${e.date}`); })); if(neg.length)return `<div class="danger-note"><strong>Cash flow warning:</strong> ${esc(neg[0])}.</div>`; if(!data.cashflowEvents.length)return `<div class="warning">No events yet. Add line items or generate a pay cycle plan.</div>`; return `<div class="success-note">No negative balances detected in the current plan.</div>`; }
+function timeline(proj){ if(!proj.events.length)return `<div class="warning">No cash flow events yet.</div>`; const groups={}; proj.events.forEach(e=>(groups[e.date] ||= []).push(e)); return Object.keys(groups).map(date=>`<div class="daily-group"><div class="daily-head"><span>${date}</span><span>${groups[date].length} line item${groups[date].length>1?'s':''}</span></div>${groups[date].map(e=>`<div class="daily-event"><div><strong>${esc(e.type)}</strong>${e.tradeoffReview?'<span class="badge review">REVIEW</span>':''}</div><div>${esc(e.description)}<br><small class="muted">${esc(e.category)} • ${e.type==="transfer"?`${accountName(e.accountId)} → ${accountName(e.toAccountId)}`:accountName(e.accountId)}</small></div><div class="${e.type==='income'?'amount-plus':'amount-minus'}">${e.type==='income'?'+':'-'}${money2(e.amount)}</div><div><span class="muted">Total</span><br><strong>${money2(e.total)}</strong></div><div>${data.accounts.map(a=>`<span class="balance-chip ${e.balances[a.id]<0?'neg':e.balances[a.id]<500?'low':''}">${esc(a.name)} ${money2(e.balances[a.id])}</span>`).join('')}</div><button class="btn danger small" onclick="del('cashflowEvents','${e.id}')">Delete</button></div>`).join('')}</div>`).join(''); }
+
+function wantsHTML(){ return `<h3>Wants / Needs Planner</h3><p class="hint">Capture non-budgeted items before they become random transactions.</p><div class="cards"><div class="card"><label>Total Planned</label><div class="value">${money(data.wantsNeeds.reduce((s,w)=>s+Number(w.amount||0),0))}</div></div><div class="card"><label>Due Soon</label><div class="value">${money(wantsDueSoon(45))}</div></div><div class="card"><label>Open Items</label><div class="value">${data.wantsNeeds.filter(w=>w.status!=="purchased").length}</div></div><div class="card"><label>Safe to Spend</label><div class="value">${money(safeToSpend())}</div></div></div><div class="divider"></div><div class="form-grid"><div class="field"><label>Name</label><input id="wnName" placeholder="Bike, faucets, vacation"></div><div class="field"><label>Amount</label><input id="wnAmount" type="number"></div><div class="field"><label>Type</label><select id="wnType"><option>Want</option><option>Need</option><option>Need-ish</option><option>Commitment</option></select></div><div class="field"><label>Priority</label><select id="wnPriority"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="field"><label>Target Date</label><input id="wnDate" type="date"></div><div class="field"><label>Status</label><select id="wnStatus"><option>idea</option><option>planned</option><option>funded</option><option>purchased</option></select></div><div class="field wide"><label>Notes</label><input id="wnNotes"></div><button class="btn success" onclick="addWantNeed()">Add Item</button></div><div class="divider"></div><div class="list">${wantsList()}</div>`; }
+function addWantNeed(){ const name=v("wnName"), amount=num("wnAmount"); if(!name||amount<=0)return alert("Add name and amount."); data.wantsNeeds.push({id:crypto.randomUUID(), name, amount, type:v("wnType"), priority:v("wnPriority"), targetDate:v("wnDate"), status:v("wnStatus"), notes:v("wnNotes")}); saveData(); render(); }
+function wantsList(){ if(!data.wantsNeeds.length)return `<div class="warning">No wants or needs yet.</div>`; return data.wantsNeeds.map(w=>`<div class="row-card"><div><strong>${esc(w.name)}</strong><br><small class="muted">${esc(w.type)} • ${esc(w.priority)} • ${esc(w.status)}</small></div><div>${money2(w.amount)}</div><div>${esc(w.targetDate||"No date")}</div><div>${safeToSpend()>=Number(w.amount)?'<span class="amount-plus">Fits current safe-to-spend</span>':'<span class="amount-minus">Needs planning</span>'}</div><button class="btn danger small" onclick="del('wantsNeeds','${w.id}')">Delete</button></div>`).join(""); }
+
+function tradeoffHTML(){ const dining=diningStats(); return `<h3>Trade-Off Coach</h3><p class="hint">Review discretionary or semi-discretionary spending without killing joy. The goal is visibility, not shame.</p><div class="cards"><div class="card"><label>Dining Total</label><div class="value">${money(dining.total)}</div><p class="hint">${dining.count} items</p></div><div class="card"><label>Dining Avoidable Estimate</label><div class="value">${money(dining.avoidable)}</div><p class="hint">At ${data.settings.diningReflectionPct}% reflection value</p></div><div class="card"><label>Missed Opportunity Total</label><div class="value">${money(missedOpportunityTotal())}</div></div><div class="card"><label>Reflection %</label><input type="number" value="${data.settings.diningReflectionPct}" onchange="updatePath('settings.diningReflectionPct', this.value)"></div></div><div class="divider"></div><h3>Add Trade-Off Review</h3><div class="form-grid"><div class="field"><label>Item</label><input id="toName" placeholder="Dinner, tickets, Amazon"></div><div class="field"><label>Actual Cost</label><input id="toAmount" type="number"></div><div class="field"><label>Purpose</label><input id="toPurpose" placeholder="Family connection"></div><div class="field"><label>Value Type</label><select id="toValue"><option>Connection</option><option>Convenience</option><option>Celebration</option><option>Experience</option><option>Impulse</option><option>Need</option></select></div><div class="field"><label>Could same value happen at %?</label><input id="toPct" type="number" value="60"></div><button class="btn purple" onclick="addTradeoff()">Review Trade-Off</button></div><div class="divider"></div><div class="insight">Every yes has a trade-off. This may have been worth it; the coach simply makes what it displaced visible.</div><div class="divider"></div><div class="list">${tradeoffList()}</div>`; }
+function addTradeoff(){ const name=v("toName"), amount=num("toAmount"), reflectionPercent=Number(v("toPct")||60); if(!name||amount<=0)return alert("Add item and amount."); const avoidableSpend=amount-(amount*reflectionPercent/100); data.tradeoffReviews.push({id:crypto.randomUUID(), name, amount, purpose:v("toPurpose"), valueType:v("toValue"), reflectionPercent, avoidableSpend, reviewedAt:todayISO()}); saveData(); render(); }
+function tradeoffList(){ if(!data.tradeoffReviews.length)return `<div class="warning">No trade-off reviews yet.</div>`; return data.tradeoffReviews.map(r=>`<div class="row-card"><div><strong>${esc(r.name)}</strong><br><small class="muted">${esc(r.purpose)} • ${esc(r.valueType)} • ${r.reviewedAt}</small></div><div>Cost: ${money2(r.amount)}</div><div>Reflection: ${pct(r.reflectionPercent)}</div><div>Avoidable: <strong>${money2(r.avoidableSpend)}</strong><br><small class="muted">Could fund ${esc(topTradeoffTarget(r.avoidableSpend))}</small></div><button class="btn danger small" onclick="del('tradeoffReviews','${r.id}')">Delete</button></div>`).join(""); }
+
+function debtsHTML(){ const debts=[...data.debts].sort((a,b)=>Number(b.rate||0)-Number(a.rate||0)); return `<h3>Debts</h3><p class="hint">Debt strategy supports the broader goal: live intentionally while reducing credit card pressure.</p><div class="form-grid"><div class="field"><label>Name</label><input id="dName"></div><div class="field"><label>Balance</label><input id="dBalance" type="number"></div><div class="field"><label>Rate %</label><input id="dRate" type="number"></div><div class="field"><label>Minimum</label><input id="dMin" type="number"></div><button class="btn success" onclick="addDebt()">Add Debt</button></div><div class="divider"></div><div class="list">${debts.length?debts.map((d,i)=>`<div class="row-card"><div><strong>${esc(d.name)}</strong>${i===0?'<span class="badge">HIGHEST RATE</span>':''}</div><div>${money2(d.balance)}</div><div>${pct(d.rate)}</div><div>Min ${money2(d.minPayment)}</div><button class="btn danger small" onclick="del('debts','${d.id}')">Delete</button></div>`).join(''):'<div class="warning">No debts added yet.</div>'}</div>`; }
+function addDebt(){ const name=v("dName"), balance=num("dBalance"), rate=num("dRate"), minPayment=num("dMin"); if(!name||balance<=0)return alert("Add debt name and balance."); data.debts.push({id:crypto.randomUUID(),name,balance,rate,minPayment}); saveData(); render(); }
+
+function bonusHTML(){ const net=netBonus(); return `<h3>Bonus Strategy</h3><p class="hint">Assign extra money before it disappears into normal spending.</p><div class="cards"><div class="card"><label>Gross Bonus</label><input type="number" value="${data.bonus.gross}" onchange="updatePath('bonus.gross',this.value)"></div><div class="card"><label>Tax Rate %</label><input type="number" value="${data.bonus.taxRate}" onchange="updatePath('bonus.taxRate',this.value)"></div><div class="card"><label>Estimated Net</label><div class="value">${money(net)}</div></div><div class="card"><label>Strategy</label><div class="value small">Pre-assign</div></div></div><div class="divider"></div><div class="form-grid"><div class="field"><label>Debt %</label><input type="number" value="${data.bonus.debtPct}" onchange="updatePath('bonus.debtPct',this.value)"></div><div class="field"><label>Buffer %</label><input type="number" value="${data.bonus.bufferPct}" onchange="updatePath('bonus.bufferPct',this.value)"></div><div class="field"><label>Wants/Needs %</label><input type="number" value="${data.bonus.wantsPct}" onchange="updatePath('bonus.wantsPct',this.value)"></div></div><div class="divider"></div><div class="scenario-grid"><div class="card"><label>Debt Attack</label><div class="value">${money(net*data.bonus.debtPct/100)}</div></div><div class="card"><label>Buffer</label><div class="value">${money(net*data.bonus.bufferPct/100)}</div></div><div class="card"><label>Wants / Needs</label><div class="value">${money(net*data.bonus.wantsPct/100)}</div></div></div>`; }
+
+function carHTML(){ const c=data.carFund; const m=monthsUntil(c.targetDate); const projected=Number(c.currentSaved)+Number(c.monthlyContribution)*m; const needed=m>0?Math.max(0,(Number(c.targetAmount)-Number(c.currentSaved))/m):0; const gap=Number(c.targetAmount)-projected; const progress=Number(c.targetAmount)>0?Math.min(100,Number(c.currentSaved)/Number(c.targetAmount)*100):0; return `<h3>Car Fund</h3><p class="hint">Goal tracking for larger planned purchases.</p><div class="form-grid"><div class="field"><label>Target</label><input type="number" value="${c.targetAmount}" onchange="updatePath('carFund.targetAmount', this.value)"></div><div class="field"><label>Saved</label><input type="number" value="${c.currentSaved}" onchange="updatePath('carFund.currentSaved', this.value)"></div><div class="field"><label>Monthly</label><input type="number" value="${c.monthlyContribution}" onchange="updatePath('carFund.monthlyContribution', this.value)"></div><div class="field"><label>Target Date</label><input type="date" value="${c.targetDate}" onchange="updatePath('carFund.targetDate', this.value)"></div></div><div class="divider"></div><div class="cards"><div class="card"><label>Months</label><div class="value">${m}</div></div><div class="card"><label>Projected</label><div class="value">${money(projected)}</div></div><div class="card"><label>Needed Monthly</label><div class="value">${money(needed)}</div></div><div class="card"><label>Gap</label><div class="value">${money(Math.max(0,gap))}</div></div></div><div class="divider"></div><div class="progress-shell"><div class="progress-bar" style="width:${progress}%"></div></div><div class="divider"></div>${gap>0?`<div class="warning">Projected shortfall: ${money(gap)}.</div>`:`<div class="success-note">Projected to meet or exceed goal.</div>`}<div class="divider"></div><canvas id="carChart" width="900" height="320"></canvas>`; }
 function monthsUntil(date){ const t=new Date(date+"T00:00:00"), n=new Date(); return Math.max(0,(t.getFullYear()-n.getFullYear())*12+(t.getMonth()-n.getMonth())); }
 function drawCarChart(){ const canvas=document.getElementById("carChart"); if(!canvas)return; const ctx=canvas.getContext("2d"), c=data.carFund, m=Math.max(1,monthsUntil(c.targetDate)), cur=Number(c.currentSaved), mon=Number(c.monthlyContribution), target=Number(c.targetAmount); const vals=[]; for(let i=0;i<=m;i++) vals.push(cur+mon*i); const max=Math.max(target,...vals,1), left=55, top=50, w=canvas.width-80, h=canvas.height-95; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#e5e7eb"; ctx.font="14px system-ui"; ctx.fillText("Car Fund Projection",24,28); ctx.strokeStyle="rgba(154,168,187,.35)"; ctx.beginPath(); ctx.moveTo(left,top); ctx.lineTo(left,top+h); ctx.lineTo(left+w,top+h); ctx.stroke(); vals.forEach((v,i)=>{ const x=left+i*(w/Math.max(1,vals.length-1)); const bh=v/max*h; ctx.fillStyle=i===0?"rgba(56,189,248,.72)":"rgba(34,197,94,.72)"; ctx.fillRect(x-5,top+h-bh,10,bh); }); const y=top+h-target/max*h; ctx.strokeStyle="rgba(250,204,21,.9)"; ctx.setLineDash([8,6]); ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(left+w,y); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle="#fde68a"; ctx.fillText(`Target ${money(target)}`,left+8,Math.max(18,y-8)); }
 
-function settingsHTML(){ return `
-  <h3>Settings</h3><p class="hint">Manage PIN and local data.</p>
-  <div class="cards"><div class="card"><label>Change PIN</label><input id="newPin" maxlength="4" inputmode="numeric" placeholder="4 digits"><br><br><button class="btn" onclick="changePin()">Save PIN</button></div><div class="card"><label>Export</label><p class="hint">Download JSON backup.</p><button class="btn secondary" onclick="exportData()">Export JSON</button></div><div class="card"><label>Import</label><p class="hint">Restore from JSON backup.</p><input type="file" accept="application/json" onchange="importData(this.files[0])"></div><div class="card"><label>Reset</label><p class="hint">Clear this browser's local data.</p><button class="btn danger" onclick="resetData()">Reset Everything</button></div></div>`; }
-function changePin(){ const p=document.getElementById("newPin").value.trim(); if(!/^\d{4}$/.test(p)) return alert("PIN must be 4 digits."); setPin(p); alert("PIN updated."); }
-function exportData(){ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`daily-os-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href); }
+function settingsHTML(){ return `<h3>Settings</h3><p class="hint">Manage PIN, backup, restore, and local data.</p><div class="cards"><div class="card"><label>Change PIN</label><input id="newPin" maxlength="4" inputmode="numeric" placeholder="4 digits"><br><br><button class="btn" onclick="changePin()">Save PIN</button></div><div class="card"><label>Export</label><p class="hint">Download JSON backup.</p><button class="btn secondary" onclick="exportData()">Export JSON</button></div><div class="card"><label>Import</label><p class="hint">Restore from JSON backup.</p><input type="file" accept="application/json" onchange="importData(this.files[0])"></div><div class="card"><label>Reset</label><p class="hint">Clear this browser's local data.</p><button class="btn danger" onclick="resetData()">Reset Everything</button></div></div>`; }
+function changePin(){ const p=v("newPin"); if(!/^\d{4}$/.test(p))return alert("PIN must be 4 digits."); setPin(p); alert("PIN updated."); }
+function exportData(){ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`daily-os-v2-backup-${todayISO()}.json`; a.click(); URL.revokeObjectURL(a.href); }
 function importData(file){ if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ data=merge(clone(defaults),JSON.parse(reader.result)); saveData(); render(); alert("Import complete."); }catch{ alert("Could not import that file."); } }; reader.readAsText(file); }
 function resetData(){ if(!confirm("Reset all local workspace data?"))return; data=clone(defaults); saveData(); render(); }
 
-function updatePath(path,value){ const parts=path.split('.'); let obj=data; for(let i=0;i<parts.length-1;i++) obj=obj[parts[i]]; const key=parts.at(-1); const numeric=new Set(["checking1","checking2","checking3","estimatedBonus","bonusTaxRate","k401","homeEquity","profitShare","monthlyExtraFromCarSavings","bonusDebtPct","targetAmount","currentSaved","monthlyContribution"]); obj[key]=numeric.has(key)?Number(value||0):value; saveData(); render(); }
+function updatePath(path,value){ const parts=path.split('.'); let obj=data; for(let i=0;i<parts.length-1;i++) obj=obj[parts[i]]; const key=parts.at(-1); const numeric=new Set(["requiredBuffer","diningReflectionPct","gross","taxRate","debtPct","bufferPct","wantsPct","targetAmount","currentSaved","monthlyContribution"]); obj[key]=numeric.has(key)?Number(value||0):value; saveData(); render(); }
+function del(collection,id){ data[collection]=data[collection].filter(x=>x.id!==id); saveData(); render(); }
+function v(id){ return document.getElementById(id)?.value?.trim() || ""; }
+function num(id){ return Number(v(id)||0); }
 
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{ activeOS=b.dataset.os; render(); }));
 document.addEventListener("keydown",e=>{ if(activeOS==="workspace"&&!unlocked){ if(/^\d$/.test(e.key)) pressPin(e.key); if(e.key==="Backspace") backPin(); if(e.key==="Escape") clearPin(); } });
